@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-accent: var(--color-accent);
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-muted: var(--color-muted);
+
+  /* Box Shadows */
+  --shadow-low: var(--shadow-low);
+  --shadow-high: var(--shadow-high);
+
+  /* Border Radius */
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  /* Transitions */
+  --ease-smooth: ease-out;
+}
+

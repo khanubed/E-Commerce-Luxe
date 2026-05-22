@@ -28,13 +28,28 @@ import HomeContentPage from "./pages/admin/HomeContentPage";
 import { AddProductForm } from "./pages/admin/AddProductForm";
 // import App from './App.jsx'
 
-import { AddressView, DashboardView, OrdersView, PaymentView, SecurityView, SettingsView } from "./components/accounts/AccountsCompoents";
+import {Toaster} from 'react-hot-toast'
+
+import {
+  AddressView,
+  DashboardView,
+  OrdersView,
+  PaymentView,
+  SecurityView,
+  SettingsView,
+} from "./components/accounts/AccountsCompoents";
 import CheckoutPage from "./components/cart/CheckoutPage";
 import OrderCancelPage from "./pages/account/OrderCancelPage";
-import AboutUsPage from "./pages/AboutUsPage";
-import SustainabilityPage from "./pages/SustainabilityPage";
-import CareersPage from "./pages/CareerPage";
-import PressPage from "./pages/PressPage";
+import AboutUsPage from "./pages/footer/AboutUsPage";
+import SustainabilityPage from "./pages/footer/SustainabilityPage";
+import CareersPage from "./pages/footer/CareerPage";
+import PressPage from "./pages/footer/PressPage";
+import ShippingPolicy from "./pages/footer/ShipingPolicy";
+import ReturnsExchanges from "./pages/footer/ReturnsExchanges";
+import PrivacyPolicy from "./pages/footer/PrivacyPolicy";
+import TermsOfService from "./pages/footer/TermsOfService";
+import CookiesPolicy from "./pages/footer/CookiesPolicy";
+import FAQPage from "./pages/footer/FAQPage";
 
 const router = createBrowserRouter([
   {
@@ -59,54 +74,54 @@ const router = createBrowserRouter([
       },
       {
         path: "cart",
-        children : [
+        children: [
           {
-            index : true,
-            Component : CartPage 
+            index: true,
+            Component: CartPage,
           },
           {
-            path : 'checkout',
-            Component : CheckoutPage
-          }
-        ]
+            path: "checkout",
+            Component: CheckoutPage,
+          },
+        ],
       },
       {
         path: "account",
-        Component : AccountPage,
+        Component: AccountPage,
         children: [
           {
             index: true,
             Component: DashboardView,
           },
           {
-            path : 'address',
-            Component : AddressView
+            path: "address",
+            Component: AddressView,
           },
           {
-            path : 'orders',
-            children : [
+            path: "orders",
+            children: [
               {
-                index : true,
-                Component : OrdersView
+                index: true,
+                Component: OrdersView,
               },
               {
-                path : 'order-cancel/orderid',
-                Component : OrderCancelPage
-              }
-            ]
+                path: "order-cancel/orderid",
+                Component: OrderCancelPage,
+              },
+            ],
           },
           {
-            path : 'payment' ,
-            Component : PaymentView ,
+            path: "payment",
+            Component: PaymentView,
           },
           {
-            path : 'security',
-            Component : SecurityView ,
+            path: "security",
+            Component: SecurityView,
           },
           {
-            path : 'settings',
-            Component : SettingsView
-          }
+            path: "settings",
+            Component: SettingsView,
+          },
         ],
       },
       {
@@ -115,20 +130,44 @@ const router = createBrowserRouter([
         loader: productPageLoader,
       },
       {
-        path : 'about',
-        Component : AboutUsPage
+        path: "about",
+        Component: AboutUsPage,
       },
       {
-        path : 'sustainability',
-        Component : SustainabilityPage
+        path: "sustainability",
+        Component: SustainabilityPage,
       },
       {
-        path : 'career',
-        Component : CareersPage
+        path: "career",
+        Component: CareersPage,
       },
       {
-        path : 'press',
-        Component : PressPage
+        path: "press",
+        Component: PressPage,
+      },
+      {
+        path: "faq",
+        Component: FAQPage,
+      },
+      {
+        path: "shipping-policy",
+        Component: ShippingPolicy,
+      },
+      {
+        path: "returns-exchanges",
+        Component: ReturnsExchanges,
+      },
+      {
+        path: "privacy",
+        Component: PrivacyPolicy,
+      },
+      {
+        path: "terms",
+        Component: TermsOfService,
+      },
+      {
+        path: "cookies",
+        Component: CookiesPolicy,
       },
     ],
   },
@@ -193,7 +232,33 @@ const router = createBrowserRouter([
 ]);
 
 const App = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            borderRadius: "0px", 
+            background: "#020617", 
+            color: "#fff",
+            padding: "16px",
+            fontSize: "11px",
+            fontWeight: "900",
+            letterSpacing: "0.2em",
+            border: "1px solid #ffffff10",
+            textTransform: "uppercase",
+          },
+          success: {
+            iconTheme: {
+              primary: "#d97706", // amber-600
+              secondary: "#fff",
+            },
+          },
+        }}
+      />
+      <RouterProvider router={router} />
+    </>
+  );
 };
 
 export default App;

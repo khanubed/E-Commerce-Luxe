@@ -7,6 +7,7 @@ import {
   Trash2,
   ChevronRight
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const OrderCancelPage = () => {
   const navigate = useNavigate();
@@ -21,14 +22,13 @@ const OrderCancelPage = () => {
   const handleFinish = (e) => {
     e.preventDefault();
     console.log("Final Reason:", reason === 'Other' ? otherReason : reason);
+    toast.success("Your order had been cancelled for reason : " , reason)
     setStep('done');
   };
 
   return (
     <div className=" bg-slate-50 flex items-center justify-center p-6 font-sans">
       <div className="max-w-lg w-full bg-white border border-slate-200 rounded-lg shadow-2xl overflow-hidden transition-all duration-500">
-        
-        {/* STEP 1: CONFIRMATION */}
         {step === 'confirm' && (
           <div className="animate-in fade-in zoom-in-95">
             <div className="p-10 text-center">
@@ -113,7 +113,6 @@ const OrderCancelPage = () => {
           </div>
         )}
 
-        {/* STEP 3: SUCCESS */}
         {step === 'done' && (
           <div className="p-12 text-center animate-in zoom-in-95">
             <div className="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">

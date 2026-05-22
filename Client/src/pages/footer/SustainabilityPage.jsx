@@ -7,8 +7,12 @@ import {
   ArrowRight,
   BarChart2
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const SustainabilityPage = () => {
+
+    const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900">
       
@@ -99,7 +103,7 @@ const SustainabilityPage = () => {
         <p className="text-xl font-bold max-w-xl mx-auto px-6 mb-10">
           Our ethical sourcing team is available for transparency inquiries 24/7.
         </p>
-        <button className="px-10 py-5 border-2 border-slate-900 text-slate-900 font-black uppercase text-xs tracking-[0.2em] hover:bg-slate-900 hover:text-white transition-all">
+        <button onClick={()=>navigate('../contact')} className="px-10 py-5 border-2 border-slate-900 text-slate-900 font-black uppercase text-xs tracking-[0.2em] hover:bg-slate-900 hover:text-white transition-all">
           Contact Ethics Department
         </button>
       </section>

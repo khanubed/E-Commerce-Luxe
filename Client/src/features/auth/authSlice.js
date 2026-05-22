@@ -4,7 +4,6 @@ const initialState = {
   user: JSON.parse(localStorage.getItem("user")) || null,
   token: localStorage.getItem("token") || null,
   isAuthenticated: !!localStorage.getItem("token"),
-  // Load addresses from user object or default to empty
   addresses: JSON.parse(localStorage.getItem("user"))?.addresses || [],
   lastUsedAddressId: localStorage.getItem("lastAddressId") || null,
 };
@@ -24,7 +23,6 @@ export const authSlice = createSlice({
       localStorage.setItem("token", token);
     },
 
-    // New: Update user addresses (useful for the checkout page)
     setAddresses: (state, action) => {
       state.addresses = action.payload;
       if (state.user) {
@@ -33,7 +31,6 @@ export const authSlice = createSlice({
       }
     },
 
-    // New: Remember which address they picked last time
     setLastUsedAddress: (state, action) => {
       state.lastUsedAddressId = action.payload;
       localStorage.setItem("lastAddressId", action.payload);
@@ -46,7 +43,7 @@ export const authSlice = createSlice({
       state.addresses = [];
       state.lastUsedAddressId = null;
 
-      localStorage.clear(); // Cleans up everything
+      localStorage.clear(); 
     },
   },
 });

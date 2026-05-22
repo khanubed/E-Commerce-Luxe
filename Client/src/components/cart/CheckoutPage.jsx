@@ -1,44 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   MapPin,
-  Home,
-  Briefcase,
   Plus,
-  ChevronLeft,
-  ShieldCheck,
   CreditCard,
   CheckCircle2,
-  Banknote,
-  Save,
-  Lock,
+  Package,
+  Truck,
+  ShieldCheck,
+  ChevronRight,
+  ShoppingBag,
+  Info,
+  Loader2
 } from "lucide-react";
-import {
-  setAddresses,
-  setLastUsedAddress,
-} from "../../features/auth/authSlice.js";
+import { setAddresses } from "../../features/auth/authSlice.js";
+import toast from "react-hot-toast";
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
   const { items, totalAmount } = useSelector((state) => state.cart);
-  const { addresses, lastUsedAddressId } = useSelector((state) => state.auth);
+  const { addresses } = useSelector((state) => state.auth);
 
   // --- STATE MANAGEMENT ---
-  const [selectedAddressId, setSelectedAddressId] = useState(
-    lastUsedAddressId || addresses[0]?.id,
-  );
+  const [selectedAddressId, setSelectedAddressId] = useState(addresses[0]?.id);
   const [isAddingAddress, setIsAddingAddress] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const [isAddingCard, setIsAddingCard] = useState(false);
-  const [newCard, setNewCard] = useState({
-    number: "",
-    expiry: "",
-    cvv: "",
-    name: "",
-  });
-  const [paymentMethod, setPaymentMethod] = useState("saved_card");
-
-  const [newAddress, setNewAddress] = useState({
+  // New Address Form State
+  const [addressForm, setAddressForm] = useState({
     fullName: "",
     address: "",
     city: "",
@@ -46,341 +36,254 @@ const CheckoutPage = () => {
     type: "Home",
   });
 
-  // --- LOGIC ---
+  // --- HANDLERS ---
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setAddressForm((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleAddNewAddress = (e) => {
     e.preventDefault();
-    const id = Date.now().toString(); // Temporary ID generation
-    const updatedAddresses = [...addresses, { ...newAddress, id }];
-
-    dispatch(setAddresses(updatedAddresses)); // Update Redux
-    setSelectedAddressId(id);
+    const newId = Date.now().toString();
+    const updatedAddresses = [...addresses, { ...addressForm, id: newId }];
+    
+    dispatch(setAddresses(updatedAddresses));
+    setSelectedAddressId(newId);
     setIsAddingAddress(false);
+    toast.success("Delivery address updated");
   };
 
-  const handleAddNewCard = (e) => {
-    e.preventDefault();
-    setPaymentMethod("new_card");
-    setIsAddingCard(false);
-    alert("New card details captured securely.");
-  };
+  const handlePlaceOrder = async () => {
+    if (!selectedAddressId && !isAddingAddress) {
+      toast.error("Please select a delivery destination");
+      return;
+    }
 
-  const handlePlaceOrder = () => {
-    const finalOrder = {
-      items,
-      total: totalAmount,
-      address: addresses.find((a) => a.id === selectedAddressId) || newAddress,
-      payment: paymentMethod,
-    };
-    console.log("Order Finalized:", finalOrder);
-    alert(`Order Placed via ${paymentMethod.toUpperCase()}!`);
+    setIsProcessing(true);
+    
+    // Simulate API Call
+    setTimeout(() => {
+      setIsProcessing(false);
+      toast.success("Order Placed Successfully!");
+      console.log("Final Order Data:", {
+        orderItems: items,
+        total: totalAmount,
+        shippingId: selectedAddressId,
+        payment: paymentMethod
+      });
+      // Redirect logic here: navigate('/order-success')
+    }, 2000);
   };
-
-  useEffect(() => {
-    console.log(items, totalAmount);
-  }, [items, totalAmount]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]  py-20">
-      <div className="max-w-7xl mx-auto px-6 pt-10 grid grid-cols-1 lg:grid-cols-12 gap-12">
-        <div className="lg:col-span-8 space-y-8">
-          {/* 1. SHIPPING SECTION */}
-          <section className="bg-white rounded-[2rem] p-8 border border-slate-200 shadow-sm">
-            <h2 className="text-lg font-black uppercase tracking-tight mb-6 flex items-center gap-3">
-              <MapPin size={20} className="text-slate-400" /> Shipping
-              Information
-            </h2>
+    <div className="min-h-screen bg-white pt-30 pb-16 font-sans">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+        
+        {/* --- PAGE HEADER --- */}
+        <div className="mb-12 border-b-[6px] border-slate-900 pb-8">
+          <h1 className="text-3xl md:text-7xl font-black uppercase tracking-tighter leading-[0.9]">
+            Secure Checkout<span className="text-blue-600">.</span>
+          </h1>
+          <div className="flex max-md:flex-col max-md:items-start justify-between items-center mt-6">
+            <p className="text-[8px] md:text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">
+              Transaction ID: TXN-{Date.now().toString().slice(-4)}-2026
+            </p>
+            <div className="flex items-center  gap-2 text-emerald-600">
+              <ShieldCheck size={14} />
+              <span className="text-[6px] md:text-[10px] font-black uppercase tracking-widest">End-to-End Encrypted</span>
+            </div>
+          </div>
+        </div>
 
-            {!isAddingAddress ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {addresses.map((addr) => (
-                  <div
-                    key={addr.id}
-                    onClick={() => setSelectedAddressId(addr.id)}
-                    className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${selectedAddressId === addr.id ? "border-slate-900 bg-slate-50" : "border-slate-100"}`}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-[9px] font-black uppercase bg-white px-2 py-1 rounded-md border border-slate-100">
-                        {addr.type}
-                      </span>
-                      {selectedAddressId === addr.id && (
-                        <CheckCircle2 size={18} className="text-slate-900" />
-                      )}
-                    </div>
-                    <p className="text-sm font-bold text-slate-900">
-                      {addr.fullName}
-                    </p>
-                    <p className="text-xs text-slate-500 line-clamp-1">
-                      {addr.address}, {addr.city}
-                    </p>
-                  </div>
-                ))}
-                <button
-                  onClick={() => setIsAddingAddress(true)}
-                  className="p-5 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 flex flex-col items-center justify-center gap-1 hover:border-slate-900 hover:text-slate-900 transition-all"
-                >
-                  <Plus size={20} />
-                  <span className="text-[10px] font-black uppercase">
-                    Add New Address
-                  </span>
-                </button>
-              </div>
-            ) : (
-              <form
-                onSubmit={handleAddNewAddress}
-                className="space-y-4 animate-in fade-in slide-in-from-top-2"
-              >
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    required
-                    placeholder="Full Name"
-                    className="p-4 bg-slate-50 rounded-xl text-sm outline-none focus:ring-2 focus:ring-slate-900"
-                    onChange={(e) =>
-                      setNewAddress({ ...newAddress, fullName: e.target.value })
-                    }
-                  />
-                  <select
-                    className="p-4 bg-slate-50 rounded-xl text-sm outline-none"
-                    onChange={(e) =>
-                      setNewAddress({ ...newAddress, type: e.target.value })
-                    }
-                  >
-                    <option value="Home">Home</option>
-                    <option value="Office">Office</option>
-                  </select>
-                </div>
-                <input
-                  required
-                  placeholder="Street Address"
-                  className="w-full p-4 bg-slate-50 rounded-xl text-sm outline-none"
-                  onChange={(e) =>
-                    setNewAddress({ ...newAddress, address: e.target.value })
-                  }
-                />
-                <div className="flex gap-4">
-                  <button
-                    type="submit"
-                    className="bg-slate-900 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest"
-                  >
-                    Save Address
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsAddingAddress(false)}
-                    className="text-[10px] font-black uppercase tracking-widest text-slate-400"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            )}
-          </section>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+          
+          {/* --- LEFT: SHIPMENT & PAYMENT --- */}
+          <div className="lg:col-span-7 space-y-16">
+            
+            {/* SECTION 01: DELIVERY ADDRESS */}
+            <section>
+              <h2 className="text-2xl font-black uppercase tracking-tight flex items-center gap-3 mb-8">
+                <span className="bg-slate-900 text-white w-8 h-8 flex items-center justify-center text-sm">01</span>
+                Shipping Destination
+              </h2>
 
-          {/* 2. PAYMENT SECTION */}
-          <section className="bg-white rounded-[2rem] p-8 border border-slate-200 shadow-sm">
-            <h2 className="text-lg font-black uppercase tracking-tight mb-6 flex items-center gap-3">
-              <CreditCard size={20} className="text-slate-400" /> Payment Method
-            </h2>
-
-            <div className="space-y-4">
-              {/* Option: Saved Card */}
-              {!isAddingCard && (
-                <div
-                  onClick={() => {
-                    setPaymentMethod("saved_card");
-                    setIsAddingCard(false);
-                  }}
-                  className={`p-5 rounded-2xl border-2 cursor-pointer flex items-center justify-between transition-all ${paymentMethod === "saved_card" ? "border-slate-900 bg-slate-50" : "border-slate-100"}`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-6 bg-slate-900 rounded flex items-center justify-center text-[8px] text-white font-bold">
-                      VISA
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-900">
-                        •••• 4242
-                      </p>
-                      <p className="text-[9px] text-slate-400 uppercase font-black">
-                        Stored Payment
+              {!isAddingAddress ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {addresses.map((addr) => (
+                    <div
+                      key={addr.id}
+                      onClick={() => setSelectedAddressId(addr.id)}
+                      className={`p-6 border-2 transition-all cursor-pointer relative ${
+                        selectedAddressId === addr.id 
+                        ? "border-slate-900 bg-slate-50" 
+                        : "border-slate-100 hover:border-slate-300"
+                      }`}
+                    >
+                      <div className="flex justify-between items-start mb-4">
+                        <span className="text-[9px] font-black uppercase border border-slate-900 px-2 py-1">
+                          {addr.type}
+                        </span>
+                        {selectedAddressId === addr.id && <CheckCircle2 size={18} className="text-blue-600" />}
+                      </div>
+                      <p className="font-black text-[14px] uppercase tracking-tight">{addr.fullName}</p>
+                      <p className="text-[12px] text-slate-500 font-bold mt-1">
+                        {addr.address}, {addr.city}
                       </p>
                     </div>
-                  </div>
-                  {paymentMethod === "saved_card" && (
-                    <CheckCircle2 size={18} className="text-slate-900" />
-                  )}
+                  ))}
+                  
+                  <button 
+                    onClick={() => setIsAddingAddress(true)}
+                    className="p-6 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 hover:border-slate-900 hover:bg-slate-50 transition-all text-slate-400"
+                  >
+                    <Plus size={20} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">New Address</span>
+                  </button>
                 </div>
-              )}
-
-              {/* NEW CARD FORM */}
-              {isAddingCard ? (
-                <form
-                  onSubmit={handleAddNewCard}
-                  className="p-6 bg-slate-50 rounded-[1.5rem] border border-slate-200 space-y-4 animate-in zoom-in-95"
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                      Card Details
-                    </span>
-                    <Lock size={14} className="text-slate-400" />
-                  </div>
-
-                  <input
-                    required
-                    placeholder="0000 0000 0000 0000"
-                    className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm font-mono outline-none focus:border-slate-900"
-                    onChange={(e) =>
-                      setNewCard({ ...newCard, number: e.target.value })
-                    }
-                  />
-
+              ) : (
+                <form onSubmit={handleAddNewAddress} className="space-y-4 bg-slate-50 p-8 border-2 border-slate-900">
                   <div className="grid grid-cols-2 gap-4">
                     <input
+                      name="fullName"
                       required
-                      placeholder="MM/YY"
-                      className="p-4 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-slate-900"
-                      onChange={(e) =>
-                        setNewCard({ ...newCard, expiry: e.target.value })
-                      }
+                      placeholder="FULL NAME"
+                      className="p-4 border-2 border-slate-200 focus:border-slate-900 outline-none text-xs font-black uppercase"
+                      onChange={handleInputChange}
+                    />
+                    <select
+                      name="type"
+                      className="p-4 border-2 border-slate-200 focus:border-slate-900 outline-none text-xs font-black uppercase"
+                      onChange={handleInputChange}
+                    >
+                      <option value="Home">Home</option>
+                      <option value="Office">Office</option>
+                    </select>
+                  </div>
+                  <input
+                    name="address"
+                    required
+                    placeholder="STREET ADDRESS"
+                    className="w-full p-4 border-2 border-slate-200 focus:border-slate-900 outline-none text-xs font-black uppercase"
+                    onChange={handleInputChange}
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <input
+                      name="city"
+                      required
+                      placeholder="CITY"
+                      className="p-4 border-2 border-slate-200 focus:border-slate-900 outline-none text-xs font-black uppercase"
+                      onChange={handleInputChange}
                     />
                     <input
+                      name="postalCode"
                       required
-                      placeholder="CVV"
-                      className="p-4 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-slate-900"
-                      onChange={(e) =>
-                        setNewCard({ ...newCard, cvv: e.target.value })
-                      }
+                      placeholder="POSTAL CODE"
+                      className="p-4 border-2 border-slate-200 focus:border-slate-900 outline-none text-xs font-black uppercase"
+                      onChange={handleInputChange}
                     />
                   </div>
-
-                  <input
-                    required
-                    placeholder="Cardholder Name"
-                    className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-slate-900"
-                    onChange={(e) =>
-                      setNewCard({ ...newCard, name: e.target.value })
-                    }
-                  />
-
-                  <div className="flex gap-4 pt-2">
-                    <button
-                      type="submit"
-                      className="bg-slate-900 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
-                    >
-                      <Save size={14} /> Use This Card
+                  <div className="flex gap-4 pt-4">
+                    <button type="submit" className="bg-slate-900 text-white px-8 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-colors">
+                      Save Address
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsAddingCard(false)}
-                      className="text-[10px] font-black uppercase tracking-widest text-slate-400"
-                    >
+                    <button type="button" onClick={() => setIsAddingAddress(false)} className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                       Cancel
                     </button>
                   </div>
                 </form>
-              ) : (
-                <button
-                  onClick={() => setIsAddingCard(true)}
-                  className={`w-full p-5 rounded-2xl border-2 border-dashed flex items-center gap-4 transition-all ${paymentMethod === "new_card" ? "border-slate-900 text-slate-900" : "border-slate-200 text-slate-400 hover:border-slate-400"}`}
-                >
-                  <Plus size={20} />
-                  <span className="text-[10px] font-black uppercase tracking-widest">
-                    Add New Credit / Debit Card
-                  </span>
-                </button>
               )}
+            </section>
 
-              {/* Option: Cash on Delivery */}
-              {!isAddingCard && (
-                <div
-                  onClick={() => {
-                    setPaymentMethod("cod");
-                    setIsAddingCard(false);
-                  }}
-                  className={`p-5 rounded-2xl border-2 cursor-pointer flex items-center justify-between transition-all ${paymentMethod === "cod" ? "border-emerald-500 bg-emerald-50/30" : "border-slate-100"}`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
-                      <Banknote size={20} />
+            {/* SECTION 02: PAYMENT */}
+            <section>
+              <h2 className="text-2xl font-black uppercase tracking-tight flex items-center gap-3 mb-8">
+                <span className="bg-slate-900 text-white w-8 h-8 flex items-center justify-center text-sm">02</span>
+                Payment Method
+              </h2>
+              <div className="space-y-3">
+                {['card', 'cod'].map((method) => (
+                  <label 
+                    key={method}
+                    className={`flex items-center justify-between p-8 border-2 cursor-pointer transition-all ${paymentMethod === method ? 'border-slate-900 bg-slate-50' : 'border-slate-100'}`}
+                  >
+                    <div className="flex items-center gap-6">
+                      <input 
+                        type="radio" 
+                        name="payment" 
+                        checked={paymentMethod === method} 
+                        onChange={() => setPaymentMethod(method)}
+                        className="w-4 h-4 accent-slate-900" 
+                      />
+                      <div>
+                        <p className="text-sm font-black uppercase tracking-wider">
+                          {method === 'card' ? 'Credit / Debit Card' : 'Cash on Delivery'}
+                        </p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">
+                          {method === 'card' ? 'Secure Online Transaction' : 'Pay at your doorstep'}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-900">
-                        Cash on Delivery
-                      </p>
-                      <p className="text-[9px] text-emerald-600 uppercase font-black">
-                        Pay when you receive
-                      </p>
+                    {method === 'card' ? <CreditCard size={20}/> : <Truck size={20}/>}
+                  </label>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          {/* --- RIGHT: SUMMARY --- */}
+          <div className="lg:col-span-5">
+            <div className="border-[4px] border-slate-900 p-8 sticky top-32 bg-white shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400 mb-8 flex items-center gap-2">
+                <Package size={14} /> 03. Inventory Summary
+              </h3>
+
+              <div className="space-y-6 mb-10 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                {items.map((item) => (
+                  <div key={item.id} className="flex gap-4 items-center">
+                    <div className="w-16 h-16 bg-slate-100 border border-slate-200 overflow-hidden">
+                      <img src={item.thumbnail} alt="" className="w-full h-full object-cover" />
                     </div>
+                    <div className="flex-1">
+                      <p className="text-[11px] font-black uppercase leading-tight">{item.title}</p>
+                      <p className="text-[9px] font-bold text-slate-400 uppercase">QTY: {item.quantity}</p>
+                    </div>
+                    <p className="text-sm font-black">${(item.price * item.quantity).toFixed(2)}</p>
                   </div>
-                  {paymentMethod === "cod" && (
-                    <CheckCircle2 size={18} className="text-emerald-600" />
-                  )}
+                ))}
+              </div>
+
+              <div className="space-y-4 pt-8 border-t-2 border-slate-900">
+                <div className="flex justify-between text-[11px] font-black uppercase text-slate-400">
+                  <span>Subtotal</span>
+                  <span>${totalAmount.toFixed(2)}</span>
                 </div>
-              )}
-            </div>
-          </section>
-        </div>
-
-        {/* 3. ORDER SUMMARY */}
-        <div className="lg:col-span-4">
-          <div className="bg-slate-900 text-white rounded-[2.5rem] p-10 shadow-2xl sticky top-24">
-            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8">
-              Summary
-            </h3>
-
-            <div className="space-y-6 mb-10 max-h-60 overflow-y-auto pr-4">
-              {items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex justify-between items-center"
-                >
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={item.thumbnail}
-                      className="w-12 h-12 rounded-xl object-cover bg-white/10"
-                      alt=""
-                    />
-                    <div>
-                      <p className="text-[11px] font-black line-clamp-1">
-                        {item.title}
-                      </p>
-                      <p className="text-[9px] text-slate-400 uppercase font-bold">
-                        Qty: {item.quantity}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-[11px] font-black">
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </p>
+                <div className="flex justify-between text-4xl font-black uppercase pt-4">
+                  <span>Total</span>
+                  <span>${totalAmount.toFixed(2)}</span>
                 </div>
-              ))}
-            </div>
-
-            <div className="space-y-3 border-t border-white/10 pt-8 mb-10">
-              <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest">
-                <span>Subtotal</span>
-                <span>${totalAmount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest">
-                <span>Shipping</span>
-                <span className="text-emerald-400">Calculated at Sync</span>
-              </div>
-              <div className="flex justify-between text-2xl font-black pt-4">
-                <span>Total</span>
-                <span>${totalAmount.toFixed(2)}</span>
-              </div>
-            </div>
 
-            <button
-              onClick={handlePlaceOrder}
-              className="w-full py-6 bg-white text-slate-900 rounded-3xl font-black uppercase text-[11px] tracking-[0.3em] hover:bg-slate-100 transition-all active:scale-95 shadow-xl"
-            >
-              Complete Order
-            </button>
+              <button 
+                onClick={handlePlaceOrder}
+                disabled={isProcessing}
+                className="w-full mt-10 bg-slate-900 text-white py-8 text-[12px] font-black uppercase tracking-[0.4em] hover:bg-blue-600 transition-all flex items-center justify-center gap-4 disabled:bg-slate-400 disabled:cursor-not-allowed"
+              >
+                {isProcessing ? (
+                  <>Processing <Loader2 size={18} className="animate-spin" /></>
+                ) : (
+                  <>Place Order <ChevronRight size={18} /></>
+                )}
+              </button>
 
-            <div className="mt-8 flex items-center justify-center gap-2 text-[9px] font-bold text-slate-500 uppercase tracking-widest">
-              <ShieldCheck size={14} className="text-emerald-500" /> AES-256
-              Encryption Secured
+              <div className="mt-8 p-4 bg-slate-50 border border-slate-100 flex items-start gap-3">
+                <Info size={14} className="text-blue-600 mt-0.5" />
+                <p className="text-[9px] font-bold text-slate-500 leading-normal uppercase">
+                  Verify your delivery details before final submission. Standard shipping applies to all automotive and furniture categories.
+                </p>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>

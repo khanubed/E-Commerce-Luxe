@@ -7,8 +7,10 @@ import {
 } from 'lucide-react';
 
 import { faInstagram , faLinkedin } from '@fortawesome/free-brands-svg-icons'
+import { useNavigate } from 'react-router-dom';
 
 const AboutUsPage = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900">
       
@@ -118,7 +120,7 @@ const AboutUsPage = () => {
       {/* 5. FINAL CTA */}
       <section className="py-32 px-6 text-center">
         <h2 className="text-sm font-black uppercase tracking-[0.5em] text-slate-400 mb-8">Join the Inner Circle</h2>
-        <button className="px-12 py-5 bg-slate-900 text-white font-black uppercase text-xs tracking-[0.3em] hover:bg-amber-600 transition-all duration-300">
+        <button onClick={()=>navigate('../contact')} className="px-12 py-5 bg-slate-900 text-white font-black uppercase text-xs tracking-[0.3em] hover:bg-amber-600 transition-all duration-300">
           Apply for Membership
         </button>
       </section>

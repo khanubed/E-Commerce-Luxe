@@ -1,4 +1,5 @@
 import React from "react";
+
 import {
   BaggageClaim,
   CreditCard,
@@ -10,55 +11,73 @@ import {
 } from "lucide-react";
 
 import { useDispatch, useSelector } from "react-redux";
+
 import { logout } from "../features/auth/authSlice";
 
-import {
-  NavLink,
-  Outlet,
-  useNavigate,
-} from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const AccountPage = () => {
   const user = useSelector((state) => state.auth.user.profile);
 
   const dispatch = useDispatch();
+
   const navigate = useNavigate();
 
   const handleLogout = () => {
     dispatch(logout());
+    toast.success('User Logged Out Successfully')
     navigate("/");
   };
 
   const menuItems = [
     {
       path: "/account",
+
       icon: <Grid size={18} />,
+
       label: "Overview",
+
       end: true,
     },
+
     {
       path: "/account/orders",
+
       icon: <BaggageClaim size={18} />,
+
       label: "My Orders",
     },
+
     {
       path: "/account/address",
+
       icon: <MapPin size={18} />,
+
       label: "Address Book",
     },
+
     {
       path: "/account/payment",
+
       icon: <CreditCard size={18} />,
+
       label: "Payments",
     },
+
     {
       path: "/account/security",
+
       icon: <Shield size={18} />,
+
       label: "Security",
     },
+
     {
       path: "/account/settings",
+
       icon: <Settings size={18} />,
+
       label: "Settings",
     },
   ];
@@ -66,11 +85,10 @@ const AccountPage = () => {
   return (
     <main className="pt-32 pb-24 px-4 md:px-12 max-w-[1440px] mx-auto bg-[#fafafa] min-h-screen">
       <div className="flex flex-col lg:flex-row gap-12">
-
         {/* SIDEBAR */}
+
         <aside className="w-full lg:w-72 flex-shrink-0">
           <div className="bg-white rounded-[2.5rem] p-6 border border-slate-200 shadow-sm sticky top-32">
-
             <nav className="flex flex-col gap-2">
               {menuItems.map((item) => (
                 <NavLink
@@ -86,6 +104,7 @@ const AccountPage = () => {
                   }
                 >
                   {item.icon}
+
                   {item.label}
                 </NavLink>
               ))}
@@ -100,15 +119,13 @@ const AccountPage = () => {
                 </button>
               </div>
             </nav>
-
           </div>
         </aside>
 
-        {/* PAGE CONTENT */}
+
         <div className="flex-grow space-y-12">
           <Outlet context={{ user }} />
         </div>
-
       </div>
     </main>
   );

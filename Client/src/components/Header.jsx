@@ -1,37 +1,32 @@
 import React, { useState } from "react";
 import { NavLink, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-
-import { Heart, Handbag, User, Menu, X, Search } from "lucide-react";
+import {
+  Heart,
+  Handbag,
+  User,
+  Menu,
+  X,
+  Search,
+  MoveRight,
+  HeartIcon,
+} from "lucide-react";
 import { CategoryFilter } from "./shop/CategoryFilter";
 
+// Updated Styles: Sharp underline and aggressive spacing
 const navLinkStyles = ({ isActive }) =>
-  `text-sm font-medium uppercase tracking-wide transition-colors ${
+  `text-[14px] font-black uppercase tracking-[0.3em] transition-all duration-300 ${
     isActive
-      ? "text-slate-900 border-b-2 border-slate-900 pb-1"
+      ? "text-slate-900 border-b border-slate-900 pb-1"
       : "text-slate-500 hover:text-slate-900"
   }`;
 
 const Header = () => {
   const isAuth = useSelector((state) => state.auth.isAuthenticated);
-  const [search, setSearch] = useState("");
-
-  const navigate = useNavigate();
-
-  const handleSearch = () => {
-    if (!search.trim()) return;
-
-    navigate(`/shop?search=${search}`);
-    setIsOpen(false);
-  };
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-  };
   const items = useSelector((state) => state.cart.items);
+  const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const searchQuery = searchParams.get("search") || "";
@@ -48,12 +43,9 @@ const Header = () => {
       ...updates,
     };
 
-    // remove empty/default values
     if (!params.search) delete params.search;
     if (params.sort === "Newest") delete params.sort;
     if (params.category === "all") delete params.category;
-
-    // reset page on filter change
     if (
       updates.search !== undefined ||
       updates.sort !== undefined ||
@@ -61,203 +53,187 @@ const Header = () => {
     ) {
       params.page = 1;
     }
-
+    navigate(`/shop`)
     setSearchParams(params);
+    setIsOpen(false)
+  };
+
+  const handleSearch = () => {
+    if (!search.trim()) return;
+    navigate(`/shop?search=${search}`);
+    setIsOpen(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleSearch();
   };
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200">
-        <nav className="h-16 max-w-7xl mx-auto px-4 py-6 md:px-8 flex items-center justify-between">
+      <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-slate-100">
+        <nav className="h-20 max-w-7xl mx-auto px-6 flex items-center justify-between">
           <Link
             to="/"
-            className="text-xl font-bold tracking-tight text-slate-900"
+            className="text-2xl font-black uppercase tracking-[0.2em] text-slate-900 group"
           >
-            LuxeStore
+            Luxe
+            <span className="text-amber-600 group-hover:text-slate-900 transition-colors">
+              Store
+            </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8"></div>
-          {/* SEARCH */}
-          <div className="relative hidden md:flex w-full max-w-md items-center">
+          <div className="relative hidden md:flex w-full max-w-xs items-center group">
             <input
               type="text"
-              placeholder="Search by name, brand or category..."
-              className="w-full pl-4 pr-14 py-2 bg-slate-50 border border-slate-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-slate-900/5 transition-all text-sm outline-none"
+              placeholder="SEARCH COLLECTION..."
+              className="w-full pl-0 pr-10 py-2 bg-transparent border-b border-slate-200 focus:border-slate-900 transition-all text-[10px] font-bold tracking-widest uppercase outline-none placeholder:text-slate-400"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={handleKeyDown}
             />
-
             <button
               onClick={handleSearch}
-              className="absolute right-2 p-2 rounded-xl hover:bg-slate-200 transition"
+              className="absolute right-0 p-2 text-slate-600 hover:text-slate-900 transition-colors"
             >
-              <Search size={18} />
+              <Search size={16} strokeWidth={3} />
             </button>
           </div>
-          <div className="hidden md:flex items-center gap-9">
-            <NavLink to="/" className={navLinkStyles}>
-              Home
-            </NavLink>
 
-            <NavLink to="/shop" className={navLinkStyles}>
-              Shop
-            </NavLink>
+          <div className="flex  justify-center items-center gap-6">
+            <div className="hidden lg:flex items-center gap-10">
+              <NavLink to="/" className={navLinkStyles}>
+                Home
+              </NavLink>
+              <NavLink to="/shop" className={navLinkStyles}>
+                Shop
+              </NavLink>
+              <NavLink to="/contact" className={navLinkStyles}>
+                Contact
+              </NavLink>
+            </div>
 
-            <NavLink to="/contact" className={navLinkStyles}>
-              Contact
-            </NavLink>
-            {isAuth ? (
-              <div className="flex gap-4">
-                <NavLink to="/wishlist" className="hover:opacity-70 transition">
-                  <Heart size={27} />
-                </NavLink>
+            <div className="flex items-center gap-6">
+              {isAuth ? (
+                <div className="hidden md:flex items-center gap-6 border-l border-slate-100 pl-6">
+                  <NavLink
+                    to="/wishlist"
+                    className="text-slate-600  hover:text-slate-900 transition-colors"
+                  >
+                    <Heart size={25} strokeWidth={2} />
+                  </NavLink>
 
-                <NavLink
-                  to="/cart"
-                  className="relative hover:opacity-70 transition"
-                >
-                  <Handbag size={27} />
+                  <NavLink
+                    to="/cart"
+                    className="relative text-slate-600 text-[14px] hover:text-slate-900 transition-colors"
+                  >
+                    <Handbag size={25} strokeWidth={2} />
+                    {items.length > 0 && (
+                      <span className="absolute -top-2 -right-2 w-4 h-4 bg-amber-600 text-white text-[8px] font-black flex items-center justify-center rounded-none italic">
+                        {items.length}
+                      </span>
+                    )}
+                  </NavLink>
 
-                  <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-slate-900 text-white text-[10px] flex items-center justify-center">
-                    {items.length}
-                  </span>
-                </NavLink>
+                  <NavLink
+                    to="/account"
+                    className="text-slate-600 hover:text-slate-900 transition-colors"
+                  >
+                    <User size={25} strokeWidth={2} />
+                  </NavLink>
+                </div>
+              ) : (
+                <div className="hidden md:flex items-center gap-4">
+                  <Link
+                    to="/auth/login"
+                    className="text-[14px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/auth/signup"
+                    className="bg-slate-900 text-white px-6 py-2.5 rounded-none text-[14px] font-black uppercase tracking-widest hover:bg-amber-600 transition-all"
+                  >
+                    Join
+                  </Link>
+                </div>
+              )}
+            </div>
 
-                <NavLink to="/account" className="hover:opacity-70 transition">
-                  <User size={27} />
-                </NavLink>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <Link
-                  to="/auth/signup"
-                  className="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-semibold hover:scale-[1.02] transition"
-                >
-                  Sign Up
-                </Link>
-
-                <Link
-                  to="/auth/login"
-                  className="border border-slate-300 px-5 py-2 rounded-full text-sm font-semibold hover:bg-slate-100 transition"
-                >
-                  Login
-                </Link>
-              </div>
-            )}
+            {/* Mobile Menu Trigger */}
+            <button
+              onClick={() => setIsOpen(true)}
+              className="lg:hidden text-slate-900"
+            >
+              <Menu size={24} strokeWidth={1.5} />
+            </button>
           </div>
-
-          <button onClick={() => setIsOpen(true)} className="md:hidden">
-            <Menu size={26} />
-          </button>
         </nav>
       </header>
 
+      {/* 5. Mobile Sidebar: Transformed to Drawer Gallery style */}
       <aside
-        className={`fixed top-0 right-0 overflow-y-auto h-screen w-[280px] bg-white z-50 shadow-2xl transform transition-transform duration-300 md:hidden ${
+        className={`fixed top-0 right-0 h-screen w-full sm:w-[350px] bg-slate-950 text-white z-60 shadow-2xl transform overflow-y-auto transition-transform duration-500 ease-in-out md:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between p-5 border-b">
-          <h2 className="font-bold text-lg">Menu</h2>
-
-          <button onClick={() => setIsOpen(false)}>
-            <X size={24} />
+        <div className="flex items-center justify-between p-8 border-b border-white/10">
+          <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-amber-500">
+            Navigation
+          </h2>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="text-white hover:rotate-90 transition-transform"
+          >
+            <X size={24} strokeWidth={1} />
           </button>
         </div>
 
-        <div className="flex flex-col p-5 gap-6">
-          <div className="relative md:hidden flex w-full max-w-md items-center">
-            <input
-              type="text"
-              placeholder="Search by name, brand or category..."
-              className="w-full pl-4 pr-14 py-2 bg-slate-50 border border-slate-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-slate-900/5 transition-all text-sm outline-none"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={handleKeyDown}
+        <div className="flex flex-col p-10 gap-8">
+          <div className="flex flex-col gap-6">
+            <MobileLink to="/" label="Home" onClick={() => setIsOpen(false)} />
+            <MobileLink
+              to="/shop"
+              label="Shop"
+              onClick={() => setIsOpen(false)}
             />
-
-            <button
-              onClick={handleSearch}
-              className="absolute right-2 p-2 rounded-xl hover:bg-slate-200 transition"
-            >
-              <Search size={18} />
-            </button>
-          </div>
-          <NavLink
-            to="/"
-            className={navLinkStyles}
-            onClick={() => setIsOpen(false)}
-          >
-            Home
-          </NavLink>
-
-          <NavLink
-            to="/shop"
-            className={navLinkStyles}
-            onClick={() => setIsOpen(false)}
-          >
-            Shop
-          </NavLink>
-
-          <NavLink
-            to="/contact"
-            className={navLinkStyles}
-            onClick={() => setIsOpen(false)}
-          >
-            Contact
-          </NavLink>
-
-          <div className="border-t pt-6 flex flex-col gap-5">
-            {isAuth ? (
+            <MobileLink
+              to="/contact"
+              label="Contact"
+              onClick={() => setIsOpen(false)}
+            />
+            {isAuth && (
               <>
-                <NavLink
+                <MobileLink
                   to="/wishlist"
+                  label="Wislist"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3"
-                >
-                  <Heart size={20} />
-                  Wishlist
-                </NavLink>
-
-                <NavLink
+                />
+                <MobileLink
                   to="/cart"
+                  label="Cart"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3"
-                >
-                  <Handbag size={20} />
-                  Cart
-                </NavLink>
-
-                <NavLink
+                />
+                <MobileLink
                   to="/account"
+                  label="Account"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3"
-                >
-                  <User size={20} />
-                  Account
-                </NavLink>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/auth/signup"
-                  onClick={() => setIsOpen(false)}
-                  className="bg-slate-900 text-white py-3 rounded-full text-center font-semibold"
-                >
-                  Sign Up
-                </Link>
-
-                <Link
-                  to="/auth/login"
-                  onClick={() => setIsOpen(false)}
-                  className="border border-slate-300 py-3 rounded-full text-center font-semibold"
-                >
-                  Login
-                </Link>
+                />
               </>
             )}
           </div>
+          {!isAuth && (
+            <div className="mt-12 space-y-6 pt-10 border-t border-white/5">
+              <Link
+                to="/auth/signup"
+                className="flex items-center justify-between w-full group"
+              >
+                <span className="text-2xl font-black uppercase tracking-tighter italic">
+                  Join Now
+                </span>
+                <MoveRight className="group-hover:translate-x-2 transition-transform text-amber-500" />
+              </Link>
+            </div>
+          )}
           <CategoryFilter
             activeCategory={activeCategory}
             onCategoryChange={(category) => updateParams({ category })}
@@ -267,5 +243,16 @@ const Header = () => {
     </>
   );
 };
+
+// Sub-component for Mobile Links to keep it clean
+const MobileLink = ({ to, label, onClick }) => (
+  <NavLink
+    to={to}
+    onClick={onClick}
+    className="text-4xl font-black uppercase tracking-tighter text-slate-500 hover:text-white hover:italic transition-all"
+  >
+    {label}
+  </NavLink>
+);
 
 export default Header;

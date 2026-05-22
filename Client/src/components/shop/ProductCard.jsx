@@ -2,11 +2,10 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleWishlist } from "../../features/wishlist/wishlistSlice.js";
 import { addToCart, removeFromCart } from "../../features/cart/cartSlice.js";
-import { Heart, Star, ShoppingBag } from "lucide-react"; // Added Star and ShoppingBag
+import { Heart, Star, ShoppingBag, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const ProductCard = (product) => {
-  // 1. Destructure more data from the product object
   const { 
     title, 
     brand, 
@@ -29,18 +28,19 @@ export const ProductCard = (product) => {
     state.cart.items.some((item) => item.id === id),
   );
 
-  // Calculate original price if there's a discount
   const originalPrice = (price / (1 - discountPercentage / 100)).toFixed(2);
 
   return (
     <div
-      className="group cursor-pointer bg-slate-200 p-4 rounded-[1rem] border border-slate-300 hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-500"
+      className="group cursor-pointer bg-white"
       onClick={() => navigate(`/product/${id}`)}
     >
-      <div className="relative aspect-5/4 overflow-hidden bg-slate-100 rounded-[0.75rem] mb-5">
-        {/* Discount Badge */}
+      {/* Image Container: Sharp Edges, Minimal Border */}
+      <div className="relative aspect-[5/4] overflow-hidden bg-slate-50 border border-slate-100 group-hover:border-slate-300 transition-all duration-700">
+        
+        {/* Discount Badge: High Contrast Rectangular */}
         {discountPercentage > 0 && (
-          <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-red-500 text-white text-[10px] font-black uppercase tracking-tighter rounded-full">
+          <div className="absolute top-0 left-0 z-10 px-3 py-2 bg-amber-600 text-white text-[9px] font-black uppercase tracking-[0.2em]">
             -{Math.round(discountPercentage)}%
           </div>
         )}
@@ -48,73 +48,74 @@ export const ProductCard = (product) => {
         <img
           src={thumbnail}
           alt={title}
-          className="w-full h-full object-contain transition-transform duration-1000 group-hover:scale-110"
+          className="w-full h-full object-contain group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
         />
 
-        {/* Wishlist Button */}
-        <div className="absolute top-4 right-4 z-10">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              dispatch(toggleWishlist(product));
-            }}
-            className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all duration-300 ${
-              isFavorited
-                ? "bg-slate-900 text-white scale-110"
-                : "bg-white/80 backdrop-blur-md text-slate-900 hover:bg-slate-900 hover:text-white"
-            }`}
-          >
-            <Heart size={18} fill={isFavorited ? "currentColor" : "none"} />
-          </button>
-        </div>
+        {/* Wishlist Button: Minimalist */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            dispatch(toggleWishlist(product));
+          }}
+          className={`absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center transition-all duration-500 ${
+            isFavorited ? "text-amber-600" : "text-slate-300 hover:text-slate-900"
+          }`}
+        >
+          <Heart size={18} fill={isFavorited ? "currentColor" : "none"} strokeWidth={1.5} />
+        </button>
 
-        {/* Status Overlay for Low Stock */}
+        {/* Low Stock Warning: Subtle Technical Text */}
         {availabilityStatus === "Low Stock" && (
-          <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center pointer-events-none">
-             <span className="bg-amber-500/90 backdrop-blur-sm text-white text-[9px] font-bold px-4 py-1 uppercase tracking-[0.2em] rounded-full">
-               Limited Stock
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
+             <span className="text-[8px] font-black text-amber-600 uppercase tracking-[0.3em] bg-white/90 px-3 py-1 border border-amber-600/20">
+               Limited Edition
              </span>
           </div>
         )}
 
-        {/* Add to Cart Button */}
+        {/* Add to Cart: Full Width Reveal */}
         <button
           onClick={(e) => {
             e.stopPropagation();
-            isCarted
-              ? dispatch(removeFromCart(product.id))
+            isCarted 
+              ? dispatch(removeFromCart(product.id)) 
               : dispatch(addToCart(product));
           }}
-          className={`absolute bottom-4 left-4 right-4 py-3 text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500 rounded-xl flex items-center justify-center gap-2 ${
+          className={`absolute bottom-0 left-0 right-0 py-5 text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-500 transform border-t border-slate-900/10 ${
             isCarted 
-            ? "bg-red-50 text-red-600 opacity-100 translate-y-0" 
-            : "bg-slate-900/90 backdrop-blur-md text-white opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0"
+            ? "bg-amber-600 text-white translate-y-0" 
+            : "bg-slate-950 text-white translate-y-full group-hover:translate-y-0"
           }`}
         >
-          <ShoppingBag size={14} />
-          {isCarted ? "Remove" : "Add to Cart"}
+          <div className="flex items-center justify-center gap-3">
+            {isCarted ? <ShoppingBag size={12} /> : <Plus size={12} />}
+            {isCarted ? "In Archive" : "Purchase"}
+          </div>
         </button>
       </div>
 
-      <div className="px-1 space-y-2">
+      {/* Product Details: Editorial Spacing */}
+      <div className="mt-6 space-y-3 px-1">
         <div className="flex justify-between items-start">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+          <div className="space-y-1">
+            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">
               {brand || category}
             </p>
-            <h4 className="text-sm font-bold text-slate-900 line-clamp-1">{title}</h4>
+            <h4 className="text-[13px] font-black uppercase tracking-tight text-slate-900 leading-tight group-hover:text-amber-600 transition-colors duration-300">
+              {title}
+            </h4>
           </div>
-          {/* Star Rating */}
-          <div className="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-lg">
-            <Star size={10} className="fill-amber-400 text-amber-400" />
-            <span className="text-[10px] font-bold text-slate-600">{rating}</span>
+          
+          <div className="flex items-center gap-1.5 opacity-60">
+            <Star size={10} className="fill-slate-900 text-slate-900" />
+            <span className="text-[10px] font-bold text-slate-900 tracking-tighter">{rating}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 pt-1">
-          <p className="text-lg font-black text-slate-900">${price}</p>
+        <div className="flex items-baseline gap-3">
+          <p className="text-base font-medium text-slate-950 tracking-tighter">${price}</p>
           {discountPercentage > 0 && (
-            <p className="text-xs text-slate-400 line-through">${originalPrice}</p>
+            <p className="text-[11px] text-slate-400 line-through tracking-tighter">${originalPrice}</p>
           )}
         </div>
       </div>

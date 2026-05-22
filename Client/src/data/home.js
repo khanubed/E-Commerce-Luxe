@@ -235,27 +235,41 @@ export const faqData = [
 export const footerData = {
   brand: {
     name: "LuxeStore",
-    description:
-      "Curating the finest lifestyle essentials for the modern home. Quality, elegance, and sustainability in every piece.",
+    description: "Curating the finest lifestyle essentials for the modern home. Quality, elegance, and sustainability in every piece.",
     socials: [
-      { id: 1, name: "Facebook", href: "#", icon: faFacebookF },
-      { id: 2, name: "Instagram", href: "#", icon: faInstagram },
-      { id: 3, name: "Twitter", href: "#", icon: faXTwitter },
-      { id: 4, name: "LinkedIn", href: "#", icon: faLinkedinIn },
+      // { id: 1, name: "Facebook", href: "#", icon: faFacebookF },
+      { id: 2, name: "Instagram", href: "https://www.instagram.com/ubyd_pathan08/", icon: faInstagram },
+      { id: 3, name: "Twitter", href: "https://x.com/home", icon: faXTwitter },
+      { id: 4, name: "LinkedIn", href: "https://www.linkedin.com/in/khanubed/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3B3kgL%2FdGOSViETofLiG9Mqg%3D%3D", icon: faLinkedinIn },
     ],
   },
   links: [
     {
       title: "Shop",
-      items: ["New Arrivals", "Best Sellers", "Home Decor", "Lifestyle"],
+      items: [
+        { name: "New Arrivals", path: "/shop" },
+        { name: "Best Sellers", path: "/shop" },
+        { name: "Home Decor", path: "/shop" },
+        { name: "Lifestyle", path: "/shop" },
+      ],
     },
     {
       title: "Company",
-      items: ["About Us", "Sustainability", "Careers", "Press"],
+      items: [
+        { name: "About Us", path: "/about" },
+        { name: "Sustainability", path: "/sustainability" },
+        { name: "Careers", path: "/career" },
+        { name: "Press", path: "/press" },
+      ],
     },
     {
       title: "Support",
-      items: ["Shipping Policy", "Returns & Exchanges", "FAQ", "Contact Us"],
+      items: [
+        { name: "Shipping Policy", path: "/shipping-policy" },
+        { name: "Returns & Exchanges", path: "/returns-exchanges" },
+        { name: "FAQ", path: "/faq" }, 
+        { name: "Contact Us", path: "/contact" },
+      ],
     },
   ],
   copyright: `© ${new Date().getFullYear()} LuxeStore Inc. All rights reserved.`,

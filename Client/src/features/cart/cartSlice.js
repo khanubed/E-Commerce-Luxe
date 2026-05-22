@@ -1,24 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// 1. Get items from localStorage first
 const savedItems = JSON.parse(localStorage.getItem('cartItems')) || [];
 
-// 2. Define the helper (keeping it outside for cleanliness)
 const calculateTotals = (items) => {
   const amount = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const count = items.reduce((acc, item) => acc + item.quantity, 0);
   return { amount, count };
 };
 
-// 3. Calculate initial values immediately
 const initialTotals = calculateTotals(savedItems);
 
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
     items: savedItems,
-    totalAmount: initialTotals.amount, // No longer 0 on load!
-    totalItems: initialTotals.count,   // No longer 0 on load!
+    totalAmount: initialTotals.amount, 
+    totalItems: initialTotals.count,   
   },
   reducers: {
     addToCart: (state, action) => {

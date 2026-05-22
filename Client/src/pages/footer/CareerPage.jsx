@@ -7,8 +7,11 @@ import {
   Briefcase,
   Globe
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const CareersPage = () => {
+    const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900">
       
@@ -138,7 +141,7 @@ const CareersPage = () => {
         <h2 className="text-lg font-black uppercase tracking-tighter mb-8">
           Don’t see a fit?
         </h2>
-        <button className="px-12 py-5 border-2 border-slate-900 text-slate-900 font-black uppercase text-xs tracking-[0.3em] hover:bg-slate-900 hover:text-white transition-all duration-300">
+        <button onClick={()=>navigate('../contact')} className="px-12 py-5 border-2 border-slate-900 text-slate-900 font-black uppercase text-xs tracking-[0.3em] hover:bg-slate-900 hover:text-white transition-all duration-300">
           Send a Spontaneous Application
         </button>
       </section>

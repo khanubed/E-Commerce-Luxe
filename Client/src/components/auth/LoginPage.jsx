@@ -5,6 +5,7 @@ import { Lock, Mail } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../features/auth/authSlice";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const LoginPage = () => {
 
     dispatch(login({ user: tempUser, token: tempToken }));
     navigate("/");
+    toast.success('User LoggedIn Successfully')
   };
 
   return (

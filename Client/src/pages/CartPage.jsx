@@ -1,15 +1,14 @@
-import { Lock, Minus, MoveRight, Plus, Truck, Trash2 } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import { Lock, MoveRight, Truck } from "lucide-react";
+import React, { useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { removeFromCart, updateQuantity } from "../features/cart/cartSlice.js"; // Adjust path
+import { removeFromCart, updateQuantity } from "../features/cart/cartSlice.js";
 import { CartItem } from "../components/cart/CartItem.jsx";
 import { SummaryRow } from "./SummaryRow.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const CartPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const cartItems = useSelector((state) => state.cart.items);
 
   const handleUpdate = (id, delta, currentQty) => {
@@ -29,90 +28,98 @@ const CartPage = () => {
   const total = subtotal + tax;
 
   return (
-    <main className="pt-32 pb-24 max-w-[1280px] mx-auto px-6 md:px-12 bg-white min-h-screen">
-      <h1 className="text-4xl font-bold text-slate-900 mb-12">Your Cart</h1>
+    <main className="pt-24 pb-24 max-w-[1440px] mx-auto px-6 md:px-12 bg-white min-h-screen transition-colors duration-500">
+      {/* 1. ARCHITECTURAL HEADER */}
+      <header className="border-b border-slate-950 pb-4 mb-4">
+        <h1 className="text-3xl font-black uppercase tracking-tighter text-slate-900">
+          Your Archive<span className="text-amber-600">.</span>
+        </h1>
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mt-3">
+          Review your selection before final acquisition
+        </p>
+      </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        <div className="lg:col-span-8 space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+        {/* 2. ITEMS LIST */}
+        <div className="lg:col-span-7 space-y-1">
           {cartItems.length > 0 ? (
-            cartItems.map((item) => (
-              <CartItem
-                key={item.id}
-                item={item}
-                onUpdate={handleUpdate}
-                onRemove={handleRemove}
-              />
-            ))
+            <div className="border-t border-slate-100">
+              {cartItems.map((item) => (
+                <div key={item.id} className="border-b border-slate-100 py-2">
+                  <CartItem
+                    item={item}
+                    onUpdate={handleUpdate}
+                    onRemove={handleRemove}
+                  />
+                </div>
+              ))}
+            </div>
           ) : (
-            <div className="py-20 text-center border-2 border-dashed border-slate-100 rounded-2xl">
-              <p className="text-slate-400 font-medium">
-                Your cart is currently empty.
+            <div className="py-32 text-center border border-dashed border-slate-200">
+              <p className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-300">
+                Archive is currently empty
               </p>
-              <a
-                href="/"
-                className="text-slate-900 font-bold underline underline-offset-4 mt-4 inline-block italic"
+              <Link
+                to="/shop"
+                className="text-[10px] font-black uppercase tracking-widest text-slate-900 border-b-2 border-amber-600 mt-8 inline-block hover:text-amber-600 transition-colors"
               >
-                Explore the Collection
-              </a>
+                Return to Collection
+              </Link>
             </div>
           )}
         </div>
 
-        {/* Order Summary */}
-        <div className="lg:col-span-4">
-          <div className="sticky top-32 space-y-6">
-            <div className="p-8 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-50">
-              <h2 className="text-xl font-bold text-slate-900 mb-8 tracking-tight">
+        {/* 3. ORDER SUMMARY (STICKY MANIFESTO) */}
+        <div className="lg:col-span-5">
+          <div className="sticky top-32 space-y-8">
+            <div className="p-10 bg-white border border-slate-950 relative overflow-hidden">
+              {/* Decorative technical line */}
+              <div className="absolute top-0 left-0 w-2 h-full bg-slate-900"></div>
+              
+              <h2 className="text-[14px] font-black text-slate-900 mb-10 uppercase tracking-[0.3em] flex items-center gap-3">
                 Order Summary
               </h2>
 
-              <div className="space-y-4 mb-8">
+              <div className="space-y-6 mb-10">
                 <SummaryRow
-                  label="Subtotal"
+                  label="Archive Subtotal"
                   value={`$${subtotal.toLocaleString()}`}
                 />
-                <SummaryRow label="Estimated Shipping" value="FREE" />
+                <SummaryRow label="Logistics (Express)" value="COMPLIMENTARY" />
                 <SummaryRow
-                  label="Tax (8%)"
+                  label="Service Tax (8%)"
                   value={`$${tax.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
                 />
-                <div className="pt-4 border-t border-slate-100 flex justify-between">
-                  <span className="text-lg font-bold text-slate-900">
-                    Total
-                  </span>
-                  <span className="text-lg font-bold text-slate-900">
-                    $
-                    {total.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                    })}
-                  </span>
+                
+                <div className="pt-8 border-t-2 border-slate-950 flex justify-between items-end">
+                  <div>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Total Payable</span>
+                    <span className="text-3xl font-black text-slate-900 tracking-tighter">
+                      ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <Lock size={16} className="mb-2 text-slate-300" />
                 </div>
               </div>
 
               <button
-                onClick={() => navigate('/cart/checkout') }
-                className="w-full py-5 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg flex items-center justify-center gap-3"
+                onClick={() => navigate('/cart/checkout')}
+                className="w-full py-6 bg-slate-900 text-white text-[12px] font-black uppercase tracking-[0.3em] hover:bg-amber-600 transition-all duration-500 flex items-center justify-center gap-4 group"
               >
-                Proceed to Checkout
-                <MoveRight size={18} />
+                Place Order
+                <MoveRight size={18} className="group-hover:translate-x-2 transition-transform" />
               </button>
-
-              <div className="mt-6 flex items-center justify-center gap-2 text-slate-400">
-                <Lock size={14} />
-                <span className="text-[10px] font-bold uppercase tracking-widest">
-                  Encrypted & Secure
-                </span>
-              </div>
             </div>
 
-            <div className="p-6 bg-slate-50 border border-slate-100 rounded-2xl flex items-center gap-4">
-              <Truck className="text-slate-900" size={24} />
+            {/* SHIPPING INFO (Subtle Technical Block) */}
+            <div className="p-6 border border-slate-100 flex items-start gap-4">
+              <Truck className="text-slate-900 mt-1" size={20} />
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-widest text-slate-900">
-                  Complimentary Express Shipping
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-900">
+                  Global Express Fulfillment
                 </p>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Estimated delivery: 2-3 business days.
+                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                  Complimentary white-glove delivery. Estimated arrival in 48-72 hours.
                 </p>
               </div>
             </div>

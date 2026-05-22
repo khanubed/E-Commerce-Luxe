@@ -19,12 +19,12 @@ export const CategoryFilter = ({ activeCategory, onCategoryChange }) => {
     <div className="space-y-10 py-2">
       {Object.keys(categoryGroups).map((group) => (
         <div className="animate-in fade-in slide-in-from-left-2 duration-500 mb-4" key={group}>
-          <h3 className="text-[16px] font-bold uppercase text-slate-900 mb-2 flex items-center gap-3">
+          <h3 className="text-[16px] font-bolder uppercase text-slate-300 md:text-slate-900 mb-2 flex items-center gap-3">
             {group}
             <span className="h-[1px] flex-grow bg-slate-100"></span>
           </h3>
 
-          <ul className="space-y-0.8">
+          <ul className="space-y-1">
             {categoryGroups[group].map((category) => {
               const isActive = activeCategory === category;
 
@@ -32,7 +32,7 @@ export const CategoryFilter = ({ activeCategory, onCategoryChange }) => {
                 <li key={category} className="relative flex items-center">
                   {/* Active Indicator Line */}
                   <div 
-                    className={`absolute -left-4 w-1 h-4 bg-slate-900 rounded-full transition-all duration-500 ${
+                    className={`absolute -left-4 w-1 h-4 bg-slate-400 md:bg-slate-900 rounded-full transition-all duration-500 ${
                       isActive ? "opacity-100 scale-100" : "opacity-0 scale-0"
                     }`} 
                   />
@@ -41,15 +41,15 @@ export const CategoryFilter = ({ activeCategory, onCategoryChange }) => {
                     onClick={() => onCategoryChange(category)}
                     className={`text-[16px] capitalize transition-all duration-300 flex items-center w-full ${
                       isActive
-                        ? "text-slate-900 font-bold translate-x-1"
-                        : "text-slate-700 hover:text-slate-900 hover:translate-x-1"
+                        ? "md:text-slate-900 text-slate-200 font-bold translate-x-1"
+                        : "md:text-slate-700 text-slate-400 hover:text-slate-900 hover:translate-x-1"
                     }`}
                   >
                     {category.replaceAll("-", " ")}
                     
-                    {/* Visual dot for active item */}
+                    {/* Visual dot for active item */ }
                     {isActive && (
-                      <span className="ml-2 w-1 h-1 rounded-full bg-slate-900 animate-pulse" />
+                      <span className="ml-2 w-1 h-1 rounded-full bg-slate-400 md:bg-slate-900 animate-pulse" />
                     )}
                   </button>
                 </li>

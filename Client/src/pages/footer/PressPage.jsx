@@ -7,8 +7,10 @@ import {
   Camera, 
   Share2
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const PressPage = () => {
+    const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900">
       
@@ -129,7 +131,7 @@ const PressPage = () => {
             placeholder="Journalist Email Address" 
             className="flex-grow bg-transparent outline-none text-sm font-medium"
           />
-          <button className="text-[10px] font-black uppercase tracking-widest">Subscribe</button>
+          <button onClick={()=>navigate('../contact')}  className="text-[10px] font-black uppercase tracking-widest">Subscribe</button>
         </div>
       </section>
 

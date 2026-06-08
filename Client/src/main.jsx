@@ -4,6 +4,10 @@ import "./index.css";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import App from "./App";
+import { injectStore } from "./api/axios.js";
+
+injectStore(store); 
+
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

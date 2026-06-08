@@ -1,9 +1,12 @@
 import React from "react";
-import { heroData } from "../data/home";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
-const Hero = () => {
+const Hero = ({ heroData }) => {
+  const { backgroundImage, title, description, primaryBtn, secondaryBtn } = heroData;
+
+  console.log("Hero Data", heroData);
+
   return (
     <section className="relative h-204.5 min-h-150 flex items-center overflow-hidden bg-slate-900">
       <div className="absolute inset-0 z-0">

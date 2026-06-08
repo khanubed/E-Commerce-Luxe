@@ -1,9 +1,10 @@
 import React from 'react';
-import { categorySection } from '../data/home.js';
+// import { categorySection } from '../data/home.js';
 import { MoveRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const Categories = () => {
+const Categories = ({categorySection}) => {
+
   const { title, subtitle, viewAllLink, categories } = categorySection;
 
   return (

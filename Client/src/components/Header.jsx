@@ -24,6 +24,7 @@ const navLinkStyles = ({ isActive }) =>
 const Header = () => {
   const isAuth = useSelector((state) => state.auth.isAuthenticated);
   const items = useSelector((state) => state.cart.items);
+  const itemsLength = useSelector((state)=> state.cart.totalProducts)
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();

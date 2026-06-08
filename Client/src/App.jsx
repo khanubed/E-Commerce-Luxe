@@ -1,245 +1,66 @@
-import React from "react";
-import {
-  createBrowserRouter,
-  Navigate,
-  RouterProvider,
-} from "react-router-dom";
-import MainLayout from "./layouts/MainLayout";
-import Home from "./pages/Home";
-import AuthLayout from "./layouts/AuthLayout";
-import SignupPage from "./components/auth/SignupPage";
-import LoginPage from "./components/auth/LoginPage";
-import ShopPage from "./pages/ShopPage";
-import ContactPage from "./pages/ContactPage";
-import WishlistPage from "./pages/WishlistPage";
-import CartPage from "./pages/CartPage";
-import AccountPage from "./pages/AccountPage";
-import { Provider } from "react-redux";
-
-import ProductPage from "./pages/ProductPage";
-import { productPageLoader } from "./router/router";
-import AdminLayout from "./layouts/AdminLayout";
-import OverviewPage from "./pages/admin/OverviewPage";
-import { ProductsManagementPage } from "./pages/admin/ProductsManagementPage";
-import CustomerManagementPage from "./pages/admin/CustomerManagementPage";
-import OrderManagementPage from "./pages/admin/OrderManagementPage";
-import AdminSettings from "./pages/admin/AdminSettings";
-import HomeContentPage from "./pages/admin/HomeContentPage";
-import { AddProductForm } from "./pages/admin/AddProductForm";
-// import App from './App.jsx'
-
-import {Toaster} from 'react-hot-toast'
-
-import {
-  AddressView,
-  DashboardView,
-  OrdersView,
-  PaymentView,
-  SecurityView,
-  SettingsView,
-} from "./components/accounts/AccountsCompoents";
-import CheckoutPage from "./components/cart/CheckoutPage";
-import OrderCancelPage from "./pages/account/OrderCancelPage";
-import AboutUsPage from "./pages/footer/AboutUsPage";
-import SustainabilityPage from "./pages/footer/SustainabilityPage";
-import CareersPage from "./pages/footer/CareerPage";
-import PressPage from "./pages/footer/PressPage";
-import ShippingPolicy from "./pages/footer/ShipingPolicy";
-import ReturnsExchanges from "./pages/footer/ReturnsExchanges";
-import PrivacyPolicy from "./pages/footer/PrivacyPolicy";
-import TermsOfService from "./pages/footer/TermsOfService";
-import CookiesPolicy from "./pages/footer/CookiesPolicy";
-import FAQPage from "./pages/footer/FAQPage";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <MainLayout />,
-    children: [
-      {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "shop",
-        element: <ShopPage />,
-      },
-      {
-        path: "contact",
-        element: <ContactPage />,
-      },
-      {
-        path: "wishlist",
-        element: <WishlistPage />,
-      },
-      {
-        path: "cart",
-        children: [
-          {
-            index: true,
-            Component: CartPage,
-          },
-          {
-            path: "checkout",
-            Component: CheckoutPage,
-          },
-        ],
-      },
-      {
-        path: "account",
-        Component: AccountPage,
-        children: [
-          {
-            index: true,
-            Component: DashboardView,
-          },
-          {
-            path: "address",
-            Component: AddressView,
-          },
-          {
-            path: "orders",
-            children: [
-              {
-                index: true,
-                Component: OrdersView,
-              },
-              {
-                path: "order-cancel/orderid",
-                Component: OrderCancelPage,
-              },
-            ],
-          },
-          {
-            path: "payment",
-            Component: PaymentView,
-          },
-          {
-            path: "security",
-            Component: SecurityView,
-          },
-          {
-            path: "settings",
-            Component: SettingsView,
-          },
-        ],
-      },
-      {
-        path: "product/:productId",
-        element: <ProductPage />,
-        loader: productPageLoader,
-      },
-      {
-        path: "about",
-        Component: AboutUsPage,
-      },
-      {
-        path: "sustainability",
-        Component: SustainabilityPage,
-      },
-      {
-        path: "career",
-        Component: CareersPage,
-      },
-      {
-        path: "press",
-        Component: PressPage,
-      },
-      {
-        path: "faq",
-        Component: FAQPage,
-      },
-      {
-        path: "shipping-policy",
-        Component: ShippingPolicy,
-      },
-      {
-        path: "returns-exchanges",
-        Component: ReturnsExchanges,
-      },
-      {
-        path: "privacy",
-        Component: PrivacyPolicy,
-      },
-      {
-        path: "terms",
-        Component: TermsOfService,
-      },
-      {
-        path: "cookies",
-        Component: CookiesPolicy,
-      },
-    ],
-  },
-  {
-    path: "/auth",
-    element: <AuthLayout />,
-    children: [
-      {
-        index: true,
-        element: <Navigate to="/auth/login" />,
-      },
-      {
-        path: "login",
-        element: <LoginPage />,
-      },
-      {
-        path: "signup",
-        element: <SignupPage />,
-      },
-    ],
-  },
-  {
-    path: "/admin",
-    element: <AdminLayout />,
-    children: [
-      {
-        index: true,
-        Component: OverviewPage,
-      },
-      {
-        path: "products",
-        children: [
-          {
-            index: true,
-            Component: ProductsManagementPage,
-          },
-          {
-            path: "add",
-            Component: AddProductForm,
-          },
-        ],
-      },
-
-      {
-        path: "users",
-        Component: CustomerManagementPage,
-      },
-      {
-        path: "orders",
-        Component: OrderManagementPage,
-      },
-      {
-        path: "settings",
-        Component: AdminSettings,
-      },
-      {
-        path: "homepage",
-        Component: HomeContentPage,
-      },
-    ],
-  },
-]);
+import React, { useEffect, useState } from "react";
+import { RouterProvider } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { router } from "./router/router.jsx";
+import { setCredentials, setLoading } from "./features/auth/authSlice.js";
+import API from "./api/axios.js";
 
 const App = () => {
+  const dispatch = useDispatch();
+  // Local state to keep the router unmounted until the network check completes
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Ensure your server is configured to read cookies (withCredentials: true)
+        // if you aren't storing the token explicitly in localStorage!
+        const response = await API.get("/api/auth/me");
+
+        if (response.data.success) {
+          dispatch(
+            setCredentials({
+              user: response.data.user,
+            }),
+          );
+          console.log(response.data)
+          console.log("Authentication successfully initialized.");
+        }
+      } catch (error) {
+        console.warn("Session verification failed: User is unauthenticated.");
+      } finally {
+        dispatch(setLoading(false));
+        // The check is complete — safe to unlock the UI layer
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, [dispatch]);
+
+  // 🛑 THE LOADING GATE: Do not evaluate routes while the request is in flight
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-[#0B0F17] flex items-center justify-center font-sans">
+        <div className="text-center space-y-4">
+          <div className="w-8 h-8 border-2 border-slate-700 border-t-white rounded-full animate-spin mx-auto" />
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+            SYS_BOOT: Verifying Core Session...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <Toaster
         position="top-right"
         toastOptions={{
           style: {
-            borderRadius: "0px", 
-            background: "#020617", 
+            borderRadius: "0px",
+            background: "#020617",
             color: "#fff",
             padding: "16px",
             fontSize: "11px",

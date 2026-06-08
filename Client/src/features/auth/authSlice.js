@@ -1,52 +1,79 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  user: JSON.parse(localStorage.getItem("user")) || null,
-  token: localStorage.getItem("token") || null,
-  isAuthenticated: !!localStorage.getItem("token"),
-  addresses: JSON.parse(localStorage.getItem("user"))?.addresses || [],
-  lastUsedAddressId: localStorage.getItem("lastAddressId") || null,
+  user: null,
+  accessToken: null,
+  isAuthenticated: false,
+  loading: true,
 };
 
-export const authSlice = createSlice({
+const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    login: (state, action) => {
-      const { user, token } = action.payload;
-      state.user = user;
-      state.token = token;
+    setCredentials: (state, action) => {
+      const { user, accessToken } = action.payload;
+      console.log("user from setCredentials: ", user);
+      console.log("token from setCredentials: ", accessToken);
+      if (user !== undefined) {
+        state.user = user;
+      }
+      state.accessToken = accessToken;
       state.isAuthenticated = true;
-      state.addresses = user.addresses || [];
+      state.loading = false;
+    },
 
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("token", token);
+    logoutUser: (state) => {
+      state.user = null;
+      state.accessToken = null;
+      state.isAuthenticated = false;
+      state.loading = false;
+    },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
     },
 
     setAddresses: (state, action) => {
       state.addresses = action.payload;
+
       if (state.user) {
         state.user.addresses = action.payload;
-        localStorage.setItem("user", JSON.stringify(state.user));
+      }
+    },
+
+    setWishlistItems: (state, action) => {
+      if (state.user) {
+        // Creating a shallow copy of the user object with the fresh wishlist array
+        state.user = {
+          ...state.user,
+          wishlist: action.payload,
+        };
       }
     },
 
     setLastUsedAddress: (state, action) => {
       state.lastUsedAddressId = action.payload;
-      localStorage.setItem("lastAddressId", action.payload);
     },
-
-    logout: (state) => {
-      state.user = null;
-      state.token = null;
-      state.isAuthenticated = false;
-      state.addresses = [];
-      state.lastUsedAddressId = null;
-
-      localStorage.clear(); 
+    setCartItems: (state, action) => {
+      if (state.user) {
+        state.user.cart = action.payload;
+      }
+    },
+    setCartItems: (state, action) => {
+      if (state.user) {
+        state.user.cart = action.payload; // Expects the full updated cart array from backend
+      }
     },
   },
 });
 
-export const { login, logout, setAddresses, setLastUsedAddress } = authSlice.actions;
+export const {
+  setCartItems,
+  setCredentials,
+  logoutUser,
+  setLoading,
+  setAddresses,
+  setLastUsedAddress,
+  setWishlistItems,
+} = authSlice.actions;
 export default authSlice.reducer;

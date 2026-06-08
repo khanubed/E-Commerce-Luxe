@@ -8,26 +8,44 @@ import {
   MapPin,
   Shield,
   Settings,
+  Loader2,
 } from "lucide-react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { logout } from "../features/auth/authSlice";
+// import { logout } from "../features/auth/authSlice";
 
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { logoutUser } from "../features/auth/authSlice";
+import { useState } from "react";
+import { useEffect } from "react";
+import { loginApi, logoutApi } from "../services/authApi";
 
 const AccountPage = () => {
-  const user = useSelector((state) => state.auth.user.profile);
+  const { user } = useSelector((state) => state.auth);
+  console.log(user);
+
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    if (user?.email) {
+      setLoading(false);
+    }
+  }, [user]);
 
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    dispatch(logout());
-    toast.success('User Logged Out Successfully')
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      const res = await logoutApi();
+      navigate("/");
+      dispatch(logoutUser());
+      toast.success("User Logged Out Successfully");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const menuItems = [
@@ -57,13 +75,6 @@ const AccountPage = () => {
       label: "Address Book",
     },
 
-    {
-      path: "/account/payment",
-
-      icon: <CreditCard size={18} />,
-
-      label: "Payments",
-    },
 
     {
       path: "/account/security",
@@ -81,6 +92,14 @@ const AccountPage = () => {
       label: "Settings",
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <main className="pt-32 pb-24 px-4 md:px-12 max-w-[1440px] mx-auto bg-[#fafafa] min-h-screen">
@@ -122,9 +141,8 @@ const AccountPage = () => {
           </div>
         </aside>
 
-
         <div className="flex-grow space-y-12">
-          <Outlet context={{ user }} />
+          <Outlet context={{ user: user }} />
         </div>
       </div>
     </main>

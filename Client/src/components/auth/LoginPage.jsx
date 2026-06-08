@@ -4,37 +4,35 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Lock, Mail } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { login } from "../../features/auth/authSlice";
+import {  setCredentials } from "../../features/auth/authSlice";
 import toast from "react-hot-toast";
+import { loginApi } from "../../services/authApi";
 
 const LoginPage = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const [email, setEmail] = useState("");
+ const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const tempUser = {
-      _id: "user_123",
-      profile: {
-        name: "Ubed Khan",
-        email: "ubedkhan@example.com",
-        avatar: "https://avatars.githubusercontent.com/u/178263372?v=4",
-        memberSince: "January 2026",
-        tier: "Premium",
-      },
-      auth: {
-        passwordHash: password,
-        twoFactorEnabled: true,
-      },
-    };
-    const tempToken = "abc123";
+    const loadToast = toast.loading("Logging in...");
 
-    dispatch(login({ user: tempUser, token: tempToken }));
-    navigate("/");
-    toast.success('User LoggedIn Successfully')
+    try {
+      const data = await loginApi({ email, password });
+      
+      if (data.success) {
+        dispatch(setCredentials({ 
+          user: data.user, 
+          accessToken: data.accessToken 
+        }));
+        
+        toast.success("Welcome back!", { id: loadToast });
+        navigate("/");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Login failed", { id: loadToast });
+    }
   };
 
   return (
@@ -52,7 +50,7 @@ const LoginPage = () => {
       </div>
 
       {/* Login Form */}
-      <form className="space-y-6" onSubmit={(e) => handleLogin(e)}>
+      <form className="space-y-6" onSubmit={(e) => handleSubmit(e)}>
         <div>
           <label className="block font-bold text-slate-900 mb-2 uppercase tracking-wider text-[11px]">
             Email Address
@@ -115,7 +113,7 @@ const LoginPage = () => {
           type="submit"
           className="w-full bg-slate-900 text-white py-4 px-6 rounded-xl font-bold uppercase tracking-[0.2em] text-[13px] hover:bg-slate-800 shadow-lg transition-all active:scale-[0.98]"
         >
-          Sign In
+            Sign In
         </button>
       </form>
 

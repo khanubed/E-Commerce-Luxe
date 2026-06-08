@@ -1,16 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import API from "../../api/axios";
 
 // Thunk to fetch all products for the Shop
 export const fetchAllProducts = createAsyncThunk(
-  "products/fetchAll",
-  async () => {
-    const response = await axios.get(
-      "https://dummyjson.com/products?limit=0",
-    );
-    console.log(response.data);
-    return response.data.products;
-  },
+  "products/fetchAllProducts",
+  async (params) => {
+    const response = await API.get("/api/product", {
+      params,
+    });
+
+    return response.data;
+  }
 );
 
 const productsSlice = createSlice({

@@ -1,17 +1,19 @@
 import React, { useState } from "react";
-import AuthLayout from "../../layouts/AuthLayout";
-import { Mail, User } from "lucide-react";
+import { Mail, User, Phone } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { login } from "../../features/auth/authSlice";
+import { registerApi} from "../../services/authApi";
+import { setCredentials } from "../../features/auth/authSlice";
+import toast from "react-hot-toast";
 
 const SignupPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    fullName: "",
+    name: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
     terms: false,
@@ -26,71 +28,62 @@ const SignupPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // validation
-    if (!formData.fullName.trim()) {
-      return alert("Full name is required");
+    if (!formData.name.trim()) {
+      return toast.error("Name is required");
     }
 
     if (!formData.email.trim()) {
-      return alert("Email is required");
+      return toast.error("Email is required");
     }
 
-    if (formData.password.length < 6) {
-      return alert("Password must be at least 6 characters");
+    if (!formData.phone.trim()) {
+      return toast.error("Phone number is required");
+    }
+
+    if (formData.password.length < 8) {
+      return toast.error("Password must be at least 8 characters");
     }
 
     if (formData.password !== formData.confirmPassword) {
-      return alert("Passwords do not match");
+      return toast.error("Passwords do not match");
     }
 
     if (!formData.terms) {
-      return alert("Please accept terms");
+      return toast.error("Please accept Terms & Conditions");
     }
-
-    console.log(formData);
-
-    const tempUser = {
-      _id: "user_123",
-      profile: {
-        name: "Ubed Khan",
-        email: "ubedkhan@example.com",
-        avatar: "https://avatars.githubusercontent.com/u/178263372?v=4",
-        memberSince: "January 2026",
-        tier: "Premium",
-      },
-      auth: {
-        passwordHash: formData.password,
-        twoFactorEnabled: true,
-      },
-    };
-    const tempToken = "abc123";
-    dispatch(login({ user: tempUser, token: tempToken }));
-    navigate("/");
+    try {
+      const data = await registerApi({name : formData.name , email : formData.email , phone : formData.phone , password : formData.password});
+      dispatch(setCredentials({ user: data.user, accessToken: data.accessToken }));
+      toast.success("Account created!");
+      navigate("/");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Registration failed");
+    }
   };
 
   return (
-    <div className="w-full max-w-110 ">
-      {/* Header */}
+    <div className="w-full max-w-110">
       <div className="mb-10">
         <div className="md:hidden mb-8">
           <span className="text-slate-900 font-bold text-2xl tracking-tighter">
             LuxeStore
           </span>
         </div>
+
         <h1 className="text-4xl font-bold text-slate-900 mb-2">
           Create Account
         </h1>
+
         <p className="text-slate-500">
           Start your journey into quiet luxury today.
         </p>
       </div>
 
-      {/* Registration Form */}
       <form className="space-y-6" onSubmit={handleSubmit}>
-        {/* FULL NAME */}
+        {/* NAME */}
         <div>
           <label className="block font-bold text-slate-900 mb-2 uppercase tracking-wider text-[11px]">
             Full Name
@@ -98,10 +91,10 @@ const SignupPage = () => {
 
           <div className="relative">
             <input
-              name="fullName"
-              value={formData.fullName}
+              name="name"
+              value={formData.name}
               onChange={handleChange}
-              className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 outline-none"
+              className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none"
               type="text"
               placeholder="Ubed Khan"
             />
@@ -123,13 +116,35 @@ const SignupPage = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 outline-none"
+              className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none"
               type="email"
               placeholder="ubed@example.com"
             />
 
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300">
               <Mail size={20} />
+            </span>
+          </div>
+        </div>
+
+        {/* PHONE */}
+        <div>
+          <label className="block font-bold text-slate-900 mb-2 uppercase tracking-wider text-[11px]">
+            Phone Number
+          </label>
+
+          <div className="relative">
+            <input
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none"
+              type="tel"
+              placeholder="+91 9876543210"
+            />
+
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300">
+              <Phone size={20} />
             </span>
           </div>
         </div>
@@ -145,7 +160,7 @@ const SignupPage = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 outline-none"
+              className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none"
               type="password"
               placeholder="••••••••"
             />
@@ -153,14 +168,14 @@ const SignupPage = () => {
 
           <div>
             <label className="block font-bold text-slate-900 mb-2 uppercase tracking-wider text-[11px]">
-              Confirm
+              Confirm Password
             </label>
 
             <input
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 outline-none"
+              className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none"
               type="password"
               placeholder="••••••••"
             />
@@ -183,8 +198,10 @@ const SignupPage = () => {
           </label>
         </div>
 
-        {/* SUBMIT */}
-        <button className="w-full bg-slate-900 text-white py-4 px-6 rounded-xl font-bold uppercase tracking-[0.2em] text-[13px] hover:bg-slate-800 transition-all active:scale-[0.98]">
+        <button
+          type="submit"
+          className="w-full bg-slate-900 text-white py-4 px-6 rounded-xl font-bold uppercase tracking-[0.2em] text-[13px] hover:bg-slate-800 transition-all disabled:opacity-50"
+        >
           Create Account
         </button>
       </form>
@@ -193,7 +210,7 @@ const SignupPage = () => {
         Already a member?
         <Link
           className="text-slate-900 font-bold hover:underline underline-offset-4 ml-1"
-          to={"/auth/login"}
+          to="/auth/login"
         >
           Log in here
         </Link>

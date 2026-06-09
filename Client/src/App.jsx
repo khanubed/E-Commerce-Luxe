@@ -14,8 +14,8 @@ const App = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Ensure your server is configured to read cookies (withCredentials: true)
-        // if you aren't storing the token explicitly in localStorage!
+        console.log(import.meta.env.VITE_BACKEND_URI)
+        
         const response = await API.get("/api/auth/me");
 
         if (response.data.success) {

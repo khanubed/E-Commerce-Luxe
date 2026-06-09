@@ -238,7 +238,7 @@ export const footerData = {
     description: "Curating the finest lifestyle essentials for the modern home. Quality, elegance, and sustainability in every piece.",
     socials: [
       // { id: 1, name: "Facebook", href: "#", icon: faFacebookF },
-      { id: 2, name: "Instagram", href: "https://www.instagram.com/ubyd_pathan08/", icon: faInstagram },
+      { id: 2, name: "Instagram", href: "https://www.instagram.com/ubyd_.pathan/", icon: faInstagram },
       { id: 3, name: "Twitter", href: "https://x.com/home", icon: faXTwitter },
       { id: 4, name: "LinkedIn", href: "https://www.linkedin.com/in/khanubed/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3B3kgL%2FdGOSViETofLiG9Mqg%3D%3D", icon: faLinkedinIn },
     ],

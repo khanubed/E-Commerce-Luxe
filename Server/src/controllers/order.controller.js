@@ -217,13 +217,13 @@ export const createOrder = async (req, res) => {
         shippingAddress,
         paymentMethod: "cod",
         paymentDetails: {
-          paymentStatus: "Pending", // Will change to 'Paid' upon delivery fulfillment
+          paymentStatus: "Pending",
         },
-        orderStatus: "Confirmed", // COD moves straight to processing queue
+        orderStatus: "Confirmed", 
       });
 
       await User.findByIdAndUpdate(req.user._id, {
-        $push: { orders: newOrder._id },
+        $push: { orders: newCodOrder._id },
       });
 
       await newCodOrder.save();
@@ -287,11 +287,7 @@ export const createOrder = async (req, res) => {
   }
 };
 
-/**
- * 🔐 VERIFY ONLINE PAYMENT SIGNATURE
- * Verifies the cryptographic hash signature generated after successful payment checkout popup
- * Route: POST /api/orders/verify
- */
+
 export const verifyPaymentSignature = async (req, res) => {
   try {
     const {
@@ -313,21 +309,17 @@ export const verifyPaymentSignature = async (req, res) => {
       });
     }
 
-    // Concatenate order ID and payment ID with a pipe character as specified by Razorpay docs
     const paymentSecretHashBody = razorpay_order_id + "|" + razorpay_payment_id;
 
-    // Use built-in crypto module to calculate an authentic local signature hash
     const generatedExpectedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
       .update(paymentSecretHashBody.toString())
       .digest("hex");
 
-    // Match calculated signature hash against client payload token
     const isTransactionLegit =
       generatedExpectedSignature === razorpay_signature;
 
     if (isTransactionLegit) {
-      // Update target order records inside MongoDB database collection instance
       const finalizedOrder = await Order.findByIdAndUpdate(
         localOrderId,
         {
@@ -336,7 +328,7 @@ export const verifyPaymentSignature = async (req, res) => {
             "paymentDetails.razorpaySignature": razorpay_signature,
             "paymentDetails.paymentStatus": "Paid",
             "paymentDetails.paidAt": new Date(),
-            orderStatus: "Confirmed", // Flip status safely to processing queue flow parameters
+            orderStatus: "Confirmed", 
           },
         },
         { new: true },
@@ -348,7 +340,6 @@ export const verifyPaymentSignature = async (req, res) => {
         order: finalizedOrder,
       });
     } else {
-      // Signature mismatch signifies data tampering or transaction drops midway
       await Order.findByIdAndUpdate(localOrderId, {
         $set: {
           "paymentDetails.paymentStatus": "Failed",

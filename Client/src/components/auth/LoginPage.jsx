@@ -26,6 +26,7 @@ const LoginPage = () => {
           user: data.user, 
           accessToken: data.accessToken 
         }));
+
         
         toast.success("Welcome back!", { id: loadToast });
         navigate("/");

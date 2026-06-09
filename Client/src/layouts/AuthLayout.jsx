@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 const AuthLayout = ({ children }) => {
   return (
     <div className="bg-white flex flex-col">
-      <main className="flex-grow h-screen flex flex-col md:flex-row">
+      <main className="flex-grow min-h-screen flex flex-col md:flex-row">
         {/* Brand/Hero Section */}
         <section className="hidden md:flex relative md:w-5/12 lg:w-1/2 bg-slate-900 overflow-hidden items-center justify-center p-12">
           <div className="absolute inset-0 opacity-40">

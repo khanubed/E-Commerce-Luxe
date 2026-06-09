@@ -1,52 +1,40 @@
 import Order from "../models/orderSchema.js";
 
-// 📊 GET ALL ORDERS (With User Population, Advanced Search, and Pagination)
 export const getAdminOrders = async (req, res) => {
   try {
     const { status, page = 1, limit = 10, search, sort } = req.query;
 
-    // Build initial filter object for root elements
     const matchQuery = {};
-
-    // 1. Filter by Order Tracking Status
     if (status && status !== "all") {
-      // Capitalize first letter to match your exact enum structure: "Pending", "Shipped", etc.
       matchQuery.orderStatus = status.charAt(0).toUpperCase() + status.slice(1);
     }
 
-    // 2. Setup Sorting Logic
-    let sortOptions = { createdAt: -1 }; // Default: Latest First
+    let sortOptions = { createdAt: -1 }; 
     if (sort === "Highest Amount") {
       sortOptions = { totalAmount: -1 };
     }
 
     const skipIndex = (parseInt(page) - 1) * parseInt(limit);
 
-    // 3. High Performance Pipeline Aggregation for Data Lookup Joins
     const aggregationPipeline = [
       { $match: matchQuery },
-
-      // Look up relational data from the "users" collection
       {
         $lookup: {
-          from: "users", // Must match your exact MongoDB user collection name (usually lowercase plural)
+          from: "users", 
           localField: "user",
           foreignField: "_id",
           as: "customerDetails",
         },
       },
-      // Flatten the resulting customer array
       {
         $unwind: { path: "$customerDetails", preserveNullAndEmptyArrays: true },
       },
     ];
 
-    // 4. Dynamic Complex Search Handling
     if (search) {
       aggregationPipeline.push({
         $match: {
           $or: [
-            // Look up by internal hexadecimal ObjectId format or text patterns
             {
               _id: search.match(/^[0-9a-fA-F]{24}$/)
                 ? new mongoose.Types.ObjectId(search)
@@ -59,13 +47,9 @@ export const getAdminOrders = async (req, res) => {
         },
       });
     }
-
-    // 5. Clone pipeline branches to accurately compile counting totals alongside paginated arrays
     const totalCountPipeline = [...aggregationPipeline, { $count: "count" }];
     const totalResult = await Order.aggregate(totalCountPipeline);
     const totalOrders = totalResult[0]?.count || 0;
-
-    // 6. Complete paginated execution chain
     aggregationPipeline.push(
       { $sort: sortOptions },
       { $skip: skipIndex },
@@ -80,7 +64,6 @@ export const getAdminOrders = async (req, res) => {
             $ifNull: ["$shippingAddress.fullName", "$customerDetails.name"],
           },
           customerEmail: { $ifNull: ["$customerDetails.email", "N/A"] },
-          // Ensure these fields are explicitly sent down to the frontend:
           items: 1,
           shippingAddress: 1,
           paymentMethod: 1,
@@ -106,16 +89,13 @@ export const getAdminOrders = async (req, res) => {
   }
 };
 
-// 📈 GET ORDER METRICS & TELEMETRY
 export const getAdminOrderStats = async (req, res) => {
   try {
-    // Single-pass structural calculations parsing live states
     const statsData = await Order.aggregate([
       {
         $group: {
           _id: null,
           totalCount: { $sum: 1 },
-          // Total Revenue excludes cancelled transactions to protect analytical bookkeeping accuracy
           totalRevenue: {
             $sum: {
               $cond: [
@@ -159,13 +139,11 @@ export const getAdminOrderStats = async (req, res) => {
   }
 };
 
-// 🛠️ UPDATE STATUS ALTERATION MUTATION
 export const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body; // Expecting values like: "Pending", "Confirmed", "Shipped", etc.
-
-    // Enforce matching enum criteria values
+    const { status } = req.body; 
+    
     const validStatuses = [
       "Pending",
       "Confirmed",
@@ -181,7 +159,6 @@ export const updateOrderStatus = async (req, res) => {
 
     const updateFields = { orderStatus: status };
 
-    // Inject automatic tracking stamps if an order is cancelled
     if (status === "Cancelled") {
       updateFields["cancellation.reason"] = req.body.reason || "Other";
       updateFields["cancellation.comments"] =

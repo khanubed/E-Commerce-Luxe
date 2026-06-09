@@ -11,7 +11,6 @@ const API = axios.create({
   withCredentials: true,
 });
 
-// REQUEST Interceptor: Attach Token
 API.interceptors.request.use((config) => {
   const token = store.getState().auth.accessToken;
   if (token) {
@@ -26,20 +25,18 @@ API.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     
-    // If error is 401 and we haven't retried yet
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        // Call the refresh endpoint
         const response = await axios.post(
           `${import.meta.env.VITE_BACKEND_URI}/api/auth/refresh`,
           {},
           { withCredentials: true }
         );
-        
+
         const { accessToken, user } = response.data;
-        // console.log(accessToken,user)
+        console.log(accessToken,user)
         store.dispatch(setCredentials({ accessToken, user }));
 
         console.log("user from axios: ", user)

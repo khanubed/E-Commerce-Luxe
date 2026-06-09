@@ -7,7 +7,6 @@ export const getAllUsersForAdmin = async (req, res) => {
   try {
     const { segment, search, page = 1, limit = 10 } = req.query;
 
-    // Build query object
     let query = {};
 
     // 1. Handle Global Search (Name or Email)

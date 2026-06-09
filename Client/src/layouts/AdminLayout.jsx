@@ -34,7 +34,7 @@ const AdminLayout = () => {
       path: "/admin/homepage",
       icon: <HomeIcon size={20} />,
     },
-    { name: "Settings", path: "/admin/settings", icon: <Settings size={20} /> },
+    // { name: "Settings", path: "/admin/settings", icon: <Settings size={20} /> },
     { name: "Inquiries", path: "/admin/inquiries", icon: <Phone size={20} /> },
   ];
 

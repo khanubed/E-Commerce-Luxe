@@ -25,7 +25,7 @@ import { setAddresses } from "../../features/auth/authSlice";
 // 1. DASHBOARD VIEW
 export const DashboardView = () => {
   const { user } = useOutletContext();
-
+  console.log(user.cart.length)
   return (
     <div className="space-y-12">
       <section className="bg-white rounded-[2.5rem] p-12 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
@@ -39,20 +39,19 @@ export const DashboardView = () => {
             {user.name}
           </h1>
           <p className="text-slate-500 font-medium">
-            {user.tier} Member since May 2026
+            {user.tier} Member since {
+              new Date(user.createdAt).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
           </p>
         </div>
-        <button
-          onClick={() => setActiveTab("Settings")}
-          className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest"
-        >
-          Edit Profile
-        </button>
       </section>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard label="Total Orders" value="24" />
-        <StatCard label="Reward Points" value="1,250" />
-        <StatCard label="Wishlist" value="12 Items" />
+        <StatCard label="Total Orders" value={user.orders?.length || 0} />
+        <StatCard label="Total Cart" value={user.cart?.length || 0} />
+        <StatCard label="Wishlist" value={user.wishlist?.length || 0} />
       </div>
     </div>
   );

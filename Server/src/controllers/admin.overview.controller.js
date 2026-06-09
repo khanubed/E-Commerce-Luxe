@@ -23,7 +23,7 @@ export const getAdminOverviewStats = async (req, res) => {
             { $limit: 5 },
             {
               $lookup: {
-                from: "users", // Matches user collection name
+                from: "users", 
                 localField: "user",
                 foreignField: "_id",
                 as: "customerInfo",
@@ -61,9 +61,7 @@ export const getAdminOverviewStats = async (req, res) => {
     // 3. Count total unique client profiles
     const totalCustomers = await User.countDocuments({ isAdmin: false });
 
-    // 4. Fetch Active Products and low stock metrics (less than 5 units left)
-    // Adjust thresholds or keys to fit your specific Product Schema rules
-    const activeProductsCount = await Product.countDocuments();
+    const activeProductsCount = await Product.countDocuments({ status: "published" });
     const lowStockAlerts = await Product.find({ stock: { $lt: 5 } })
       .select("title stock images price")
       .limit(3);

@@ -19,8 +19,6 @@ export const login = async (req, res) => {
 
     const user = await User.findOne({ email }).select("+password");
 
-    console.log("user", user)
-
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -40,6 +38,8 @@ export const login = async (req, res) => {
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
+    console.log( "Login refresh token : " , refreshToken);
+
     user.refreshToken = refreshToken;
     await user.save();
 
@@ -52,15 +52,17 @@ export const login = async (req, res) => {
       wishlist: user.wishlist || [],
       addresses: user.addresses || [],
       isVerified: user.isVerified,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
     };
-    console.log("user",user)
-    console.log("User Data", userData);
+    // console.log("user",user)
+    // console.log("User Data", userData);
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: false,
+
+      sameSite: "lax",
+
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
@@ -95,7 +97,7 @@ export const register = async (req, res) => {
     const { name, email, password, phone } = value;
 
     const existingUserWithMail = await User.findOne({ email });
-    console.log(existingUserWithMail)
+
     if (existingUserWithMail) {
       return res.status(409).json({
         success: false,
@@ -173,7 +175,7 @@ export const refreshAccessToken = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
 
-    // console.log("refresh token in refresh access token", refreshToken)
+    console.log("refresh token in refresh access token", refreshToken);
 
     if (!refreshToken) {
       return res.status(401).json({
@@ -331,7 +333,7 @@ export const deleteUserAddress = async (req, res) => {
           addresses: { _id: addressId },
         },
       },
-      { returnDocument: "after" }, 
+      { returnDocument: "after" },
     ).select("-password");
 
     if (!updatedUser) {
@@ -344,7 +346,7 @@ export const deleteUserAddress = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Address deleted successfully",
-      addresses: updatedUser.addresses, 
+      addresses: updatedUser.addresses,
     });
   } catch (error) {
     console.error("DELETE ADDRESS ERROR:", error);

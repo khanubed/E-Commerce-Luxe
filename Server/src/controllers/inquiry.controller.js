@@ -19,7 +19,6 @@ export const createInquiry = async (req, res) => {
   }
 };
 
-// Admin Only: Fetch All Inquiries
 export const getAllInquiries = async (req, res) => {
   try {
     const inquiries = await Inquiry.find().sort({ createdAt: -1 });
@@ -31,7 +30,6 @@ export const getAllInquiries = async (req, res) => {
   }
 };
 
-// Admin Only: Update Lifecycle Status & Notes
 export const updateInquiryStatus = async (req, res) => {
   try {
     const { id } = req.params;

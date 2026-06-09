@@ -456,7 +456,6 @@ export const getDealsOfTheDay = async (req, res) => {
   try {
     console.log("Deals of the day hitted");
 
-    // Only fetch published products flagged for the deals layout matrix
     const dealProducts = await Product.find({
       isDealOfTheDay: true,
       status: "published",

@@ -9,7 +9,6 @@ import {
   X,
   Search,
   MoveRight,
-  HeartIcon,
 } from "lucide-react";
 import { CategoryFilter } from "./shop/CategoryFilter";
 
@@ -24,7 +23,6 @@ const navLinkStyles = ({ isActive }) =>
 const Header = () => {
   const isAuth = useSelector((state) => state.auth.isAuthenticated);
   const items = useSelector((state) => state.cart.items);
-  const itemsLength = useSelector((state)=> state.cart.totalProducts)
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
@@ -54,9 +52,9 @@ const Header = () => {
     ) {
       params.page = 1;
     }
-    navigate(`/shop`)
+    navigate(`/shop`);
     setSearchParams(params);
-    setIsOpen(false)
+    setIsOpen(false);
   };
 
   const handleSearch = () => {
@@ -100,7 +98,7 @@ const Header = () => {
             </button>
           </div>
 
-          <div className="flex  justify-center items-center gap-6">
+          <div className="flex justify-center items-center gap-6">
             <div className="hidden lg:flex items-center gap-10">
               <NavLink to="/" className={navLinkStyles}>
                 Home
@@ -115,10 +113,10 @@ const Header = () => {
 
             <div className="flex items-center gap-6">
               {isAuth ? (
-                <div className="hidden md:flex items-center gap-6 border-l border-slate-100 pl-6">
+                <div className="hidden lg:flex items-center gap-6 border-l border-slate-100 pl-6">
                   <NavLink
                     to="/wishlist"
-                    className="text-slate-600  hover:text-slate-900 transition-colors"
+                    className="text-slate-600 hover:text-slate-900 transition-colors"
                   >
                     <Heart size={25} strokeWidth={2} />
                   </NavLink>
@@ -143,7 +141,7 @@ const Header = () => {
                   </NavLink>
                 </div>
               ) : (
-                <div className="hidden md:flex items-center gap-4">
+                <div className="hidden lg:flex items-center gap-4">
                   <Link
                     to="/auth/login"
                     className="text-[14px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors"
@@ -171,9 +169,9 @@ const Header = () => {
         </nav>
       </header>
 
-      {/* 5. Mobile Sidebar: Transformed to Drawer Gallery style */}
+      {/* Mobile Sidebar */}
       <aside
-        className={`fixed top-0 right-0 h-screen w-full sm:w-[350px] bg-slate-950 text-white z-60 shadow-2xl transform overflow-y-auto transition-transform duration-500 ease-in-out md:hidden ${
+        className={`fixed top-0 right-0 h-screen w-full sm:w-[350px] bg-slate-950 text-white z-50 shadow-2xl transform overflow-y-auto transition-transform duration-500 ease-in-out lg:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -206,7 +204,7 @@ const Header = () => {
               <>
                 <MobileLink
                   to="/wishlist"
-                  label="Wislist"
+                  label="Wishlist"
                   onClick={() => setIsOpen(false)}
                 />
                 <MobileLink
@@ -222,30 +220,45 @@ const Header = () => {
               </>
             )}
           </div>
+
+          {/* 🚨 Added Auth Options for Unauthenticated Mobile Users */}
           {!isAuth && (
-            <div className="mt-12 space-y-6 pt-10 border-t border-white/5">
+            <div className="mt-6 space-y-4 pt-8 border-t border-white/5">
+              <Link
+                to="/auth/login"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-between w-full group py-2"
+              >
+                <span className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-white transition-colors">
+                  Sign In
+                </span>
+              </Link>
               <Link
                 to="/auth/signup"
-                className="flex items-center justify-between w-full group"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-between w-full group py-2"
               >
-                <span className="text-2xl font-black uppercase tracking-tighter italic">
+                <span className="text-2xl font-black uppercase tracking-tighter italic group-hover:text-amber-500 transition-colors">
                   Join Now
                 </span>
                 <MoveRight className="group-hover:translate-x-2 transition-transform text-amber-500" />
               </Link>
             </div>
           )}
-          <CategoryFilter
-            activeCategory={activeCategory}
-            onCategoryChange={(category) => updateParams({ category })}
-          />
+
+          <div className="mt-4 pt-6 border-t border-white/5">
+            <CategoryFilter
+              activeCategory={activeCategory}
+              onCategoryChange={(category) => updateParams({ category })}
+            />
+          </div>
         </div>
       </aside>
     </>
   );
 };
 
-// Sub-component for Mobile Links to keep it clean
+// Sub-component for Mobile Links
 const MobileLink = ({ to, label, onClick }) => (
   <NavLink
     to={to}

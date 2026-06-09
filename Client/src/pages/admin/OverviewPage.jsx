@@ -12,9 +12,12 @@ import {
 import { useGetOverviewMetricsQuery } from "../../services/adminOverviewApi";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 // import { useGetOverviewMetricsQuery } from "../../services/adminOverviewApi";
 
 const OverviewPage = () => {
+  const navigate = useNavigate()
+
   const {
     data: serverData,
     isLoading,
@@ -52,13 +55,13 @@ const OverviewPage = () => {
       label: "Total Revenue",
       value: serverData?.stats?.totalRevenue || "$0.00",
       icon: <DollarSign className="text-emerald-600" />,
-      trend: "+12.5%",
+      // trend: "+12.5%",
     },
     {
       label: "Total Orders",
       value: serverData?.stats?.totalOrders || "0",
       icon: <ShoppingBag className="text-blue-600" />,
-      trend: "+8.2%",
+      // trend: "+8.2%",
     },
     {
       label: "New Customers",
@@ -70,7 +73,7 @@ const OverviewPage = () => {
       label: "Active Products",
       value: serverData?.stats?.activeProducts || "0",
       icon: <Package className="text-orange-600" />,
-      trend: "0%",
+      // trend: "0%",
     },
   ];
 
@@ -88,9 +91,9 @@ const OverviewPage = () => {
           >
             <div className="flex justify-between items-start mb-4">
               <div className="p-2 bg-slate-50 rounded-lg">{stat.icon}</div>
-              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
+              {/* <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
                 {stat.trend}
-              </span>
+              </span> */}
             </div>
             <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">
               {stat.label}
@@ -105,7 +108,7 @@ const OverviewPage = () => {
         <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="p-6 border-b border-slate-50 flex justify-between items-center">
             <h3 className="font-bold text-slate-900">Recent Orders</h3>
-            <button className="text-xs font-bold text-slate-400 hover:text-slate-900 flex items-center gap-1 uppercase tracking-widest">
+            <button onClick={()=> navigate("/admin/orders")} className="text-xs font-bold text-slate-400 hover:text-slate-900 flex items-center gap-1 uppercase tracking-widest">
               View All <ArrowUpRight size={14} />
             </button>
           </div>
@@ -194,7 +197,7 @@ const OverviewPage = () => {
               ))
             )}
           </div>
-          <button className="w-full mt-8 py-3 bg-slate-50 text-slate-900 text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-slate-100 transition-colors">
+          <button onClick={()=> navigate("/admin/products")} className="w-full mt-8 py-3 bg-slate-50 text-slate-900 text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-slate-100 transition-colors">
             Restock Inventory
           </button>
         </div>

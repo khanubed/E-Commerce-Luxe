@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import express from "express";
 import { config } from "dotenv";
 
-await config();
+config();
 
 import cors from "cors";
 import { connectDB } from "./config/db.js";
@@ -23,7 +23,7 @@ import inquiryRouter from "./routes/inquiry.routes.js";
 connectDB();
 
 const app = express();
-
+app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
@@ -32,7 +32,6 @@ app.use(
   }),
 );
 
-app.use(cookieParser());
 // Add this line in your main server.js file
 app.use("/uploads", express.static("uploads"));
 
@@ -50,7 +49,12 @@ app.get("/api/admin/users", protect, protectAdmin, getAllUsersForAdmin);
 app.get("/api/admin/overview", protect, protectAdmin, getAdminOverviewStats);
 app.use("/api/home-content", homecontentRouter);
 app.post("/api/admin/home-content", protect, protectAdmin, updateHomeContent);
-app.patch("/api/admin/product/toggle-deal/:id", protect, protectAdmin, toggleDealStatus);
+app.patch(
+  "/api/admin/product/toggle-deal/:id",
+  protect,
+  protectAdmin,
+  toggleDealStatus,
+);
 app.use("/api/inquiries", inquiryRouter);
 
 export default app;

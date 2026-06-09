@@ -76,21 +76,21 @@ const AccountPage = () => {
     },
 
 
-    {
-      path: "/account/security",
+    // {
+    //   path: "/account/security",
 
-      icon: <Shield size={18} />,
+    //   icon: <Shield size={18} />,
 
-      label: "Security",
-    },
+    //   label: "Security",
+    // },
 
-    {
-      path: "/account/settings",
+    // {
+    //   path: "/account/settings",
 
-      icon: <Settings size={18} />,
+    //   icon: <Settings size={18} />,
 
-      label: "Settings",
-    },
+    //   label: "Settings",
+    // },
   ];
 
   if (loading) {

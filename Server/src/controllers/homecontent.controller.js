@@ -3,7 +3,7 @@ import HomeContent from "../models/homeContentSchema.js";
 export const getHomeContent = async (req, res) => {
   try {
     let content = await HomeContent.findOne();
-    
+    // console.log("I am home content", content)
     if (!content) {
       return res.status(200).json({ 
         success: true, 

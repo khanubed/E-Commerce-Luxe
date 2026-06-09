@@ -19,6 +19,8 @@ export const login = async (req, res) => {
 
     const user = await User.findOne({ email }).select("+password");
 
+    console.log("user", user)
+
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -93,7 +95,7 @@ export const register = async (req, res) => {
     const { name, email, password, phone } = value;
 
     const existingUserWithMail = await User.findOne({ email });
-
+    console.log(existingUserWithMail)
     if (existingUserWithMail) {
       return res.status(409).json({
         success: false,

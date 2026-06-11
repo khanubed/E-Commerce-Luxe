@@ -186,11 +186,7 @@ export const refreshAccessToken = async (req, res) => {
 
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
-    // console.log("refresh  decoded", decoded)
-
     const user = await User.findById(decoded.userId);
-
-    // console.log("refresh  user", user)
 
     if (!user || user.refreshToken !== refreshToken) {
       return res.status(401).json({

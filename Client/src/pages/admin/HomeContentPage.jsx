@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   useFetchPublicHomeContentQuery, 
   useUpdateAdminHomeContentMutation 
-} from '../../services/homeContentApi'; 
+} from '../../features/info/homeContentApi'; 
 import { Eye, Grid, HomeIcon, Timer, Loader2 } from 'lucide-react';
 
 const HomeContentPage = () => {

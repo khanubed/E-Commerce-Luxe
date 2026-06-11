@@ -1,63 +1,66 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
+// === Layout Layouts ===
 import MainLayout from "../layouts/MainLayout";
-import Home from "../pages/Home";
 import AuthLayout from "../layouts/AuthLayout";
-import SignupPage from "../components/auth/SignupPage";
-import LoginPage from "../components/auth/LoginPage";
+import AdminLayout from "../layouts/AdminLayout";
+
+// === Main Route Pages ===
+import Home from "../pages/Home";
 import ShopPage from "../pages/ShopPage";
-import ContactPage from "../pages/ContactPage";
-import WishlistPage from "../pages/WishlistPage";
+import ProductPage from "../pages/ProductPage";
 import CartPage from "../pages/CartPage";
 import AccountPage from "../pages/AccountPage";
-import { Provider, useSelector } from "react-redux";
+import WishlistPage from "../pages/WishlistPage";
+import OrderSuccessPage from "../pages/OrderSuccessPage";
 
-import ProductPage from "../pages/ProductPage";
-import AdminLayout from "../layouts/AdminLayout";
+// === Feature-Injected Page Inclusions ===
+import CheckoutPage from "../pages/CheckoutPage";
+import OrderCancelPage from "../pages/OrderCancelPage";
+import LoginPage from "../features/auth/components/LoginPage";
+import SignupPage from "../features/auth/components/SignupPage";
+
+// === Static Information Footer Pages ===
+import AboutUsPage from "../pages/info/AboutUsPage";
+import ContactPage from "../pages/info/ContactPage";
+import FAQPage from "../pages/info/FAQPage";
+import PrivacyPolicy from "../pages/info/PrivacyPolicy";
+import TermsOfService from "../pages/info/TermsOfService";
+import CookiesPolicy from "../pages/info/CookiesPolicy";
+import CareerPage from "../pages/info/CareerPage";
+import PressPage from "../pages/info/PressPage";
+import ShipingPolicy from "../pages/info/ShipingPolicy";
+import ReturnsExchanges from "../pages/info/ReturnsExchanges";
+import SustainabilityPage from "../pages/info/SustainabilityPage";
+
+// === Profile Dashboard Tabs ===
+import DashboardViewPage  from '../pages/accounts/DashboardViewPage'
+import {AddressViewPage}  from '../pages/accounts/AddressViewPage'
+import {OrdersViewPage}  from '../pages/accounts/OrdersViewPage'
+import {SecurityViewPage}  from '../pages/accounts/SecurityViewPage'
+import {SettingsViewPage}  from '../pages/accounts/SettingsViewPage'
+
+// === Administrative Dash Workspace ===
+import AdminLoginPage from "../features/auth/components/AdminLoginPage";
 import OverviewPage from "../pages/admin/OverviewPage";
-import { ProductsManagementPage } from "../pages/admin/ProductsManagementPage";
+import {ProductsManagementPage} from "../pages/admin/ProductsManagementPage";
 import CustomerManagementPage from "../pages/admin/CustomerManagementPage";
 import OrderManagementPage from "../pages/admin/OrderManagementPage";
 import AdminSettings from "../pages/admin/AdminSettings";
 import HomeContentPage from "../pages/admin/HomeContentPage";
-import { AddProductForm } from "../pages/admin/AddProductForm";
-// import App from './App.jsx'
-
-import {
-  AddressView,
-  DashboardView,
-  OrdersView,
-  SecurityView,
-  SettingsView,
-} from "../components/accounts/AccountsCompoents";
-import CheckoutPage from "../components/cart/CheckoutPage";
-import OrderCancelPage from "../pages/account/OrderCancelPage";
-import AboutUsPage from "../pages/footer/AboutUsPage";
-import SustainabilityPage from "../pages/footer/SustainabilityPage";
-import CareersPage from "../pages/footer/CareerPage";
-import PressPage from "../pages/footer/PressPage";
-import ShippingPolicy from "../pages/footer/ShipingPolicy";
-import ReturnsExchanges from "../pages/footer/ReturnsExchanges";
-import PrivacyPolicy from "../pages/footer/PrivacyPolicy";
-import TermsOfService from "../pages/footer/TermsOfService";
-import CookiesPolicy from "../pages/footer/CookiesPolicy";
-import FAQPage from "../pages/footer/FAQPage";
-import { EditProductForm } from "../pages/admin/EditProductForm";
-import OrderSuccessPage from "../pages/OrderSuccessPage";
-import AdminLoginPage from "../pages/admin/AdminLoginPage";
 import AdminInquiries from "../pages/admin/AdminInquiries";
+import {AddProductForm} from "../pages/admin/AddProductForm";
+import {EditProductForm} from "../pages/admin/EditProductForm";
 
+// Secure Verification Checkpoint Gate Middleware
 const AdminProtectedGate = ({ children }) => {
   const { user } = useSelector((state) => state.auth);
-
-  // Verify token presence and check if role profile explicitly holds "admin" clearance status
   const isAdmin = user?.isAdmin === true;
 
   if (!isAdmin) {
-    // If not an admin, boot them back out to the standalone admin authentication login page
     return <Navigate to="/admin/login" replace />;
   }
-
   return children;
 };
 
@@ -87,46 +90,46 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            Component: CartPage,
+            element: <CartPage />,
           },
           {
             path: "checkout",
-            Component: CheckoutPage,
+            element: <CheckoutPage />,
           },
         ],
       },
       {
         path: "account",
-        Component: AccountPage,
+        element: <AccountPage />,
         children: [
           {
             index: true,
-            Component: DashboardView,
+            element: <DashboardViewPage />,
           },
           {
             path: "address",
-            Component: AddressView,
+            element: <AddressViewPage />,
           },
           {
             path: "orders",
             children: [
               {
                 index: true,
-                Component: OrdersView,
+                element: <OrdersViewPage />,
               },
               {
                 path: "order-cancel/:orderId",
-                Component: OrderCancelPage,
+                element: <OrderCancelPage />,
               },
             ],
           },
           {
             path: "security",
-            Component: SecurityView,
+            element: <SecurityViewPage />,
           },
           {
             path: "settings",
-            Component: SettingsView,
+            element: <SettingsViewPage />,
           },
         ],
       },
@@ -136,43 +139,43 @@ export const router = createBrowserRouter([
       },
       {
         path: "about",
-        Component: AboutUsPage,
+        element: <AboutUsPage />,
       },
       {
         path: "sustainability",
-        Component: SustainabilityPage,
+        element: <SustainabilityPage />,
       },
       {
         path: "career",
-        Component: CareersPage,
+        element: <CareerPage />,
       },
       {
         path: "press",
-        Component: PressPage,
+        element: <PressPage />,
       },
       {
         path: "faq",
-        Component: FAQPage,
+        element: <FAQPage />,
       },
       {
         path: "shipping-policy",
-        Component: ShippingPolicy,
+        element: <ShipingPolicy />,
       },
       {
         path: "returns-exchanges",
-        Component: ReturnsExchanges,
+        element: <ReturnsExchanges />,
       },
       {
         path: "privacy",
-        Component: PrivacyPolicy,
+        element: <PrivacyPolicy />,
       },
       {
         path: "terms",
-        Component: TermsOfService,
+        element: <TermsOfService />,
       },
       {
         path: "cookies",
-        Component: CookiesPolicy,
+        element: <CookiesPolicy />,
       },
     ],
   },
@@ -186,7 +189,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/auth/login" />,
+        element: <Navigate to="/auth/login" replace />,
       },
       {
         path: "login",
@@ -212,46 +215,45 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        Component: OverviewPage,
+        element: <OverviewPage />,
       },
       {
         path: "products",
         children: [
           {
             index: true,
-            Component: ProductsManagementPage,
+            element: <ProductsManagementPage />,
           },
           {
             path: "add",
-            Component: AddProductForm,
+            element: <AddProductForm />,
           },
           {
             path: "edit/:id",
-            Component: EditProductForm,
+            element: <EditProductForm />,
           },
         ],
       },
-
       {
         path: "users",
-        Component: CustomerManagementPage,
+        element: <CustomerManagementPage />,
       },
       {
         path: "orders",
-        Component: OrderManagementPage,
+        element: <OrderManagementPage />,
       },
       {
         path: "settings",
-        Component: AdminSettings,
+        element: <AdminSettings />,
       },
       {
         path: "homepage",
-        Component: HomeContentPage,
+        element: <HomeContentPage />,
       },
       {
-        path : "inquiries",
-        Component : AdminInquiries
-      }
+        path: "inquiries",
+        element: <AdminInquiries />,
+      },
     ],
   },
 ]);

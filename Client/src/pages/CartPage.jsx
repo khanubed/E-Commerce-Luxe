@@ -1,104 +1,88 @@
 import { Lock, MoveRight, Truck } from "lucide-react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
-// Redux Actions (Managing via Auth slice state)
 import { setCartItems } from "../features/auth/authSlice.js";
 
-// Axios API Services
 import {
-  getProductsListByIds,
-  toggleCart,
-  updateCartQuantityApi,
+  useGetProductsListByIdsQuery,
+  useToggleCartMutation,
+  useUpdateCartQuantityMutation,
 } from "../features/products/productApi.js";
 
-import { CartItem } from "../components/cart/CartItem.jsx";
-import { SummaryRow } from "./SummaryRow.jsx";
+import { CartItem } from "../features/cart/components/CartItem.jsx";
+import { SummaryRow } from "../features/cart/components/SummaryRow.jsx";
 
 const CartPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // 1. Subscribe directly to the auth state
   const { user, isAuthenticated } = useSelector((state) => state.auth);
 
-  // FIXED: Renamed to setLocalCartItems to avoid collision with Redux action
-  const [localCartItems, setLocalCartItems] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const rawCartArray = useMemo(() => {
+    return user?.cart?.items || user?.cart || [];
+  }, [user]);
 
-  // 2. Fetch fully populated product data matching database ids
-  useEffect(() => {
-    const fetchCartItems = async () => {
-      // Safely check down the chain for your array structure
-      const rawCartArray = user?.cart?.items || user?.cart || [];
 
-      if (!isAuthenticated || rawCartArray.length === 0) {
-        setLocalCartItems([]);
-        return;
-      }
+  const productIds = useMemo(() => {
+    if (!isAuthenticated) return [];
+    return rawCartArray
+      .map((item) => {
+        if (!item) return null;
+        if (typeof item === "string") return item;
+        return (
+          item.product?._id ||
+          item.product?.id ||
+          item.product ||
+          item._id ||
+          item.id
+        );
+      })
+      .filter(Boolean);
+  }, [rawCartArray, isAuthenticated]);
 
-      try {
-        setIsLoading(true);
+  const { data: fetchedPayload, isLoading: isQueryLoading } =
+    useGetProductsListByIdsQuery(productIds, {
+      skip: !isAuthenticated || productIds.length === 0,
+    });
 
-        // Extract IDs dynamically regardless of backend formatting configuration
-        const productIds = rawCartArray
-          .map((item) => {
-            if (!item) return null;
-            if (typeof item === "string") return item;
-            return (
-              item.product?._id ||
-              item.product?.id ||
-              item.product ||
-              item._id ||
-              item.id
-            );
-          })
-          .filter(Boolean);
+  const [toggleCart] = useToggleCartMutation();
+  const [updateCartQuantity] = useUpdateCartQuantityMutation();
 
-        // FIXED: Pass raw array directly instead of using JSON.stringify
-        const data = await getProductsListByIds(productIds);
+  const localCartItems = useMemo(() => {
+    if (!fetchedPayload) return [];
+    const productsList = fetchedPayload.products || fetchedPayload;
+    if (!Array.isArray(productsList)) return [];
 
-        if (data.success) {
-          // Re-attach quantity information back to incoming populated items
-          const hydratedItems = data.products.map((product) => {
-            const originalRecord = rawCartArray.find((item) => {
-              const targetId =
-                item?.product?._id ||
-                item?.product?.id ||
-                item?.product ||
-                item?._id ||
-                item?.id;
-              return targetId === product._id;
-            });
-            return {
-              ...product,
-              quantity: originalRecord?.quantity || 1,
-            };
-          });
+    return productsList.map((product) => {
+      const originalRecord = rawCartArray.find((item) => {
+        const targetId =
+          item?.product?._id ||
+          item?.product?.id ||
+          item?.product ||
+          item?._id ||
+          item?.id;
+        return targetId === product._id || targetId === product.id;
+      });
+      return {
+        ...product,
+        quantity: originalRecord?.quantity || 1,
+      };
+    });
+  }, [fetchedPayload, rawCartArray]);
 
-          setLocalCartItems(hydratedItems);
-        }
-      } catch (error) {
-        console.error("Cart population lifecycle error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const isLoading = isAuthenticated && productIds.length > 0 && isQueryLoading;
 
-    fetchCartItems();
-  }, [user, isAuthenticated, dispatch]);
-
-  // 3. Handle Remove Item via Backend API
   const handleRemove = async (productId) => {
     try {
-      const data = await toggleCart(productId);
-      if (data.success) {
-        dispatch(setCartItems(data.cart)); // Updates Redux, which re-triggers useEffect
-        toast.success("Removed from Archive");
-      }
+      const response = await toggleCart(productId).unwrap();
+      const freshCart = response.cart || response;
+      dispatch(setCartItems(freshCart));
+      toast.success("Removed from Archive");
     } catch (err) {
+      console.error(err);
       toast.error("Failed to remove item from cart");
     }
   };
@@ -111,30 +95,15 @@ const CartPage = () => {
     }
 
     try {
-      setLocalCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item._id === productId || item.id === productId
-            ? { ...item, quantity: newQty }
-            : item,
-        ),
-      );
-
-      const data = await updateCartQuantityApi(productId, newQty);
-
-      if (data.success) {
-        dispatch(setCartItems(data.cart));
-      }
+      const response = await updateCartQuantity({
+        productId,
+        quantity: newQty,
+      }).unwrap();
+      const freshCart = response.cart || response;
+      dispatch(setCartItems(freshCart));
     } catch (err) {
       console.error(err);
-      toast.error("Failed to alter collection index volume");
-
-      setLocalCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item._id === productId || item.id === productId
-            ? { ...item, quantity: currentQty }
-            : item,
-        ),
-      );
+      toast.error("Failed to alter quantity index balance");
     }
   };
 
@@ -178,7 +147,7 @@ const CartPage = () => {
 
   return (
     <main className="pt-24 pb-24 max-w-[1440px] mx-auto px-6 md:px-12 bg-white min-h-screen transition-colors duration-500">
-      {/* ARCHITECTURAL HEADER */}
+      {/* Architectural Branding Header section */}
       <header className="border-b border-slate-950 pb-4 mb-4">
         <h1 className="text-3xl font-black uppercase tracking-tighter text-slate-900">
           Your Archive<span className="text-amber-600">.</span>
@@ -189,7 +158,7 @@ const CartPage = () => {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
-        {/* ITEMS LIST */}
+        {/* Dynamic Items Container Block Node List */}
         <div className="lg:col-span-7 space-y-1">
           {localCartItems.length > 0 ? (
             <div className="border-t border-slate-100">
@@ -224,7 +193,7 @@ const CartPage = () => {
           )}
         </div>
 
-        {/* ORDER SUMMARY */}
+        {/* Global Checkout Ledger Order summary context widget */}
         <div className="lg:col-span-5">
           <div className="sticky top-32 space-y-8">
             <div className="p-10 bg-white border border-slate-950 relative overflow-hidden">
@@ -263,7 +232,8 @@ const CartPage = () => {
 
               <button
                 onClick={() => navigate("/cart/checkout")}
-                className="w-full py-6 bg-slate-900 text-white text-[12px] font-black uppercase tracking-[0.3em] hover:bg-amber-600 transition-all duration-500 flex items-center justify-center gap-4 group"
+                disabled={localCartItems.length === 0}
+                className="w-full py-6 bg-slate-900 text-white text-[12px] font-black uppercase tracking-[0.3em] hover:bg-amber-600 transition-all duration-500 flex items-center justify-center gap-4 group disabled:opacity-50 disabled:pointer-events-none"
               >
                 Place Order
                 <MoveRight
@@ -273,7 +243,7 @@ const CartPage = () => {
               </button>
             </div>
 
-            {/* SHIPPING INFO */}
+            {/* Fulfilment Logistics Info Unit */}
             <div className="p-6 border border-slate-100 flex items-start gap-4">
               <Truck className="text-slate-900 mt-1" size={20} />
               <div>

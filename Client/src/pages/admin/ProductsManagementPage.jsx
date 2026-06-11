@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import {
   useGetProductsQuery,
   useToggleDealStatusMutation,
-} from "../../services/productApi";
+} from "../../features/products/productApi";
 import toast from "react-hot-toast";
 
 export const ProductsManagementPage = () => {

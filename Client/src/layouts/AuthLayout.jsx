@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 const AuthLayout = ({ children }) => {
   return (
@@ -18,7 +18,7 @@ const AuthLayout = ({ children }) => {
           
           <div className="relative z-10 max-w-md text-white">
             <div className="mb-8">
-              <span className="text-white font-bold text-5xl tracking-tighter italic">LuxeStore</span>
+              <Link to={"/"} className="text-white font-bold text-5xl tracking-tighter italic">LuxeStore</Link>
             </div>
             <h2 className="text-5xl font-bold leading-tight mb-6">Join the elite circle of curated fashion.</h2>
             <p className="text-lg text-slate-300 opacity-90 leading-relaxed">

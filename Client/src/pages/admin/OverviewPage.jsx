@@ -9,11 +9,10 @@ import {
   ChevronRight,
   Loader2,
 } from "lucide-react";
-import { useGetOverviewMetricsQuery } from "../../services/adminOverviewApi";
-import { useSelector } from "react-redux";
+import { useGetOverviewMetricsQuery } from "../../features/admin/services/adminOverviewApi";
+import { useSelector } from "react-redux";  
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-// import { useGetOverviewMetricsQuery } from "../../services/adminOverviewApi";
 
 const OverviewPage = () => {
   const navigate = useNavigate()

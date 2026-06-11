@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useGetInquiriesQuery, useUpdateInquiryMutation } from "../../services/inquiryApi.js";
+import { useGetInquiriesQuery, useUpdateInquiryMutation } from "../../features/info/inquiryApi";
 import { Mail, CheckCircle2, AlertCircle, Clock, Loader2, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 

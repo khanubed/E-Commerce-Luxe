@@ -5,7 +5,6 @@ import User from "../models/userSchema.js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 
-
 export const getUserOrders = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -137,7 +136,7 @@ export const createOrder = async (req, res) => {
         paymentDetails: {
           paymentStatus: "Pending",
         },
-        orderStatus: "Confirmed", 
+        orderStatus: "Confirmed",
       });
 
       await User.findByIdAndUpdate(req.user._id, {
@@ -205,7 +204,6 @@ export const createOrder = async (req, res) => {
   }
 };
 
-
 export const verifyPaymentSignature = async (req, res) => {
   try {
     const {
@@ -246,7 +244,7 @@ export const verifyPaymentSignature = async (req, res) => {
             "paymentDetails.razorpaySignature": razorpay_signature,
             "paymentDetails.paymentStatus": "Paid",
             "paymentDetails.paidAt": new Date(),
-            orderStatus: "Confirmed", 
+            orderStatus: "Confirmed",
           },
         },
         { new: true },

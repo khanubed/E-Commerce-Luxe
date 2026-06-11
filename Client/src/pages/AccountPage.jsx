@@ -13,14 +13,12 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 
-// import { logout } from "../features/auth/authSlice";
-
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { logoutUser } from "../features/auth/authSlice";
 import { useState } from "react";
 import { useEffect } from "react";
-import { loginApi, logoutApi } from "../services/authApi";
+import {  logoutApi } from "../features/auth/authApi";
 
 const AccountPage = () => {
   const { user } = useSelector((state) => state.auth);

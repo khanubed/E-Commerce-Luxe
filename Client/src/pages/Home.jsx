@@ -6,8 +6,9 @@ import Offers from "../sections/Offers";
 import Stats from "../sections/States";
 import Testimonials from "../sections/Testimonials";
 import FAQ from "../sections/FAQ";
-import { useFetchPublicHomeContentQuery } from "../services/homeContentApi";
+// import { useFetchPublicHomeContentQuery } from "../services/homeContentApi";
 import { Loader2 } from "lucide-react";
+import { useFetchPublicHomeContentQuery } from "../features/info/homeContentApi";
 
 const Home = () => {
   const { data: homeContent, isLoading } = useFetchPublicHomeContentQuery();

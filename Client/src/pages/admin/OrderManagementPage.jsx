@@ -23,11 +23,11 @@ import {
   useGetAdminOrdersQuery,
   useGetAdminOrderStatsQuery,
   useUpdateOrderStatusMutation,
-} from "../../services/adminOrderApi";
+} from "../../features/admin/services/adminOrderApi.js";
 import {
   setSearchQuery,
   setSortBy,
-} from "../../features/admin/adminOrderSlice";
+} from "../../features/admin/slice/adminOrderSlice.js";
 import toast from "react-hot-toast";
 
 const OrderManagementPage = () => {

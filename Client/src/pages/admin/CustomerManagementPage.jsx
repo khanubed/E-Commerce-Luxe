@@ -11,7 +11,7 @@ import {
   ArrowUpRight,
   Loader2,
 } from "lucide-react";
-import { useGetAdminCustomersQuery } from "../../services/adminCustomerApi";
+import { useGetAdminCustomersQuery } from "../../features/admin/services/adminCustomerApi";
 
 const CustomerManagementPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();

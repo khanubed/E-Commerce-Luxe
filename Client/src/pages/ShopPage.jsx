@@ -1,53 +1,26 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-// import { getProducts } from "../api/product"; // Import the Axios service
-
-import { ProductCard } from "../components/shop/ProductCard";
-import { Pagination } from "../components/shop/Pagination";
-import { CategoryFilter } from "../components/shop/CategoryFilter";
-import { HeroStrip } from "../components/shop/HeroStrip";
-import { getProducts } from "../features/products/productApi";
+import { ProductCard } from "../components/shared/ProductCard";
+import { useGetProductsQuery } from "../features/products/productApi";
+import { HeroStrip } from "../features/products/components/HeroStrip";
+import { CategoryFilter } from "../features/products/components/CategoryFilter";
+import { Pagination } from "../components/shared/Pagination";
 
 const ShopPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  
-  // --- New Manual State ---
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const searchQuery = searchParams.get("search") || "";
   const sortBy = searchParams.get("sort") || "Newest";
   const activeCategory = searchParams.get("category") || "all";
   const currentPage = Number(searchParams.get("page")) || 1;
 
-  // --- Fetch Logic using Axios ---
-  useEffect(() => {
-    const fetchShopData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        const result = await getProducts({
-          page: currentPage,
-          limit: 24,
-          search: searchQuery,
-          category: activeCategory === "all" ? "" : activeCategory,
-          sort: sortBy,
-        });
-
-        setData(result);
-      } catch (err) {
-        console.error("Axios Fetch Error:", err);
-        setError(err.response?.data?.message || "Something went wrong");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchShopData();
-  }, [currentPage, searchQuery, activeCategory, sortBy]); // Re-run when URL params change
+  const { data, isLoading, isError, error } = useGetProductsQuery({
+    page: currentPage,
+    limit: 24,
+    search: searchQuery,
+    category: activeCategory === "all" ? "" : activeCategory,
+    sort: sortBy,
+  });
 
   const updateParams = (updates) => {
     const params = {
@@ -73,9 +46,13 @@ const ShopPage = () => {
     setSearchParams(params);
   };
 
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
+
   const products = data?.products || [];
   const totalPages = data?.totalPages || 1;
-  const totalProducts = data?.totalProducts || 200 ;
+  const totalProducts = data?.totalProducts || 200;
 
   // --- Rendering (Keep your existing UI logic) ---
   if (isLoading) {
@@ -92,10 +69,12 @@ const ShopPage = () => {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-bold text-red-500 mb-2">Failed to load products</h2>
+          <h2 className="text-xl font-bold text-red-500 mb-2">
+            Failed to load products
+          </h2>
           <p className="text-gray-500">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="mt-4 underline text-sm"
           >
             Try Again
@@ -106,7 +85,6 @@ const ShopPage = () => {
   }
   return (
     <main className="bg-white">
-      {/* Header */}
       <div className="max-w-[1800px] mx-auto px-6 md:px-12 pt-24 pb-4">
         <div className="flex flex-col md:flex-row md:justify-between md:items-end border-b border-slate-950 pb-6 gap-4">
           <div>
@@ -174,14 +152,16 @@ const ShopPage = () => {
           {products.length > 0 ? (
             <div className="space-y-20">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-1 gap-y-16">
-                {products.map((product) => (
-                  <div
-                    key={product._id}
-                    className="border-b border-slate-50 pb-8 hover:border-slate-200 transition-colors"
-                  >
-                    <ProductCard {...product} />
-                  </div>
-                ))}
+                {products
+                  .filter((product) => product.status !== "inactive")
+                  .map((product) => (
+                    <div
+                      key={product._id}
+                      className="border-b border-slate-50 pb-8 hover:border-slate-200 transition-colors"
+                    >
+                      <ProductCard {...product} />
+                    </div>
+                  ))}
               </div>
 
               <div className="pt-12 border-t border-slate-100">

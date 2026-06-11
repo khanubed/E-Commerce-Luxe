@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { dealsSection } from "../data/home.js";
 import { Timer, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
-import { ProductCard } from "../components/shop/ProductCard.jsx";
-import { useGetDealsOfTheDayQuery } from "../services/productApi.js";
+import { ProductCard } from "../components/shared/ProductCard.jsx";
 
-// 🚨 IMPORT SWIPER CORE AND COMPONENTS
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 
-// 🚨 IMPORT SWIPER STYLES (Make sure these are loaded in your main/index CSS if preferred)
 import "swiper/css";
 import "swiper/css/navigation";
+import { useGetDealsOfTheDayQuery } from "../features/products/productApi.js";
 
 const Deals = () => {
   const { title, description } = dealsSection;
